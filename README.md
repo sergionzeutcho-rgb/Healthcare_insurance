@@ -530,12 +530,26 @@ reports/v1/           # (Future) Generated reports
 
 **Files Protected by .gitignore:**
 ```
-.venv/               # Virtual environment (large, platform-specific)
-__pycache__/         # Python bytecode
-*.pyc
-.ipynb_checkpoints/  # Jupyter temp files
-.DS_Store           # MacOS metadata
+core.Microsoft*      # Microsoft core dumps
+core.mongo*          # MongoDB core dumps
+core.python*         # Python core dumps
+env.py              # Environment variables
+__pycache__/        # Python bytecode cache
+*.py[cod]           # Python compiled files (.pyc, .pyo, .pyd)
+node_modules/       # Node.js dependencies
+.github/            # GitHub configuration
+cloudinary_python.txt  # Cloudinary credentials
+kaggle.json         # Kaggle API credentials
+.venv/              # Virtual environment (large, platform-specific)
+.ipynb_checkpoints/ # Jupyter notebook checkpoints
+.DS_Store           # macOS metadata
+Thumbs.db           # Windows thumbnail cache
 *.log               # Log files
+*.sqlite, *.db      # Database files
+.pytest_cache/      # Pytest cache
+.coverage, htmlcov/ # Coverage reports
+dist/, build/       # Distribution and build files
+*.egg-info/, .eggs/ # Python package metadata
 ```
 
 This ensures the repository stays clean and only tracks essential project files.
