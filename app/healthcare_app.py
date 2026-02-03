@@ -271,8 +271,6 @@ elif page == "📈 Exploratory Analysis":
 
 # ===== PAGE 3: STATISTICAL TESTS =====
 elif page == "🔬 Statistical Tests":
-# ===== PAGE 3: STATISTICAL TESTS =====
-elif page == "🔬 Statistical Tests":
     st.header("🔬 Statistical Hypothesis Testing")
     
     st.markdown("""
@@ -499,7 +497,7 @@ elif page == "🤖 ML Model Performance":
             fig, ax = plt.subplots(figsize=(8, 6))
             # Simulated data for demo
             np.random.seed(42)
-            y_test = df['charges'].sample(200, random_state=42).values
+            y_test = np.array(df['charges'].sample(200, random_state=42).values)
             y_pred = y_test + np.random.normal(0, 3000, len(y_test))
             
             ax.scatter(y_test, y_pred, alpha=0.5, s=30, color='steelblue', edgecolors='black')
