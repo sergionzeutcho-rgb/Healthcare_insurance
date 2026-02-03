@@ -22,16 +22,19 @@ This project provides a comprehensive analysis of healthcare insurance costs usi
 ## Table of Contents
 
 1. [Project Objectives](#project-objectives)
-2. [Dataset Description](#dataset-description)
-3. [Project Structure](#project-structure)
-4. [Key Findings](#key-findings)
-5. [Installation & Setup](#installation--setup)
-6. [Usage](#usage)
-7. [Technologies Used](#technologies-used)
-8. [Methodology](#methodology)
-9. [Results & Performance](#results--performance)
-10. [Future Improvements](#future-improvements)
-11. [Credits](#credits)
+2. [Project Hypothesis & Validation](#project-hypothesis--validation)
+3. [Dataset Description](#dataset-description)
+4. [Project Structure](#project-structure)
+5. [Key Findings](#key-findings)
+6. [Installation & Setup](#installation--setup)
+7. [Usage](#usage)
+8. [Technologies Used](#technologies-used)
+9. [Methodology](#methodology)
+10. [Results & Performance](#results--performance)
+11. [Learning Journey & Reflections](#learning-journey--reflections)
+12. [Version Control & Project Management](#version-control--project-management)
+13. [Future Improvements](#future-improvements)
+14. [Credits](#credits)
 
 ---
 
@@ -370,13 +373,182 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 5 in
 
 ---
 
+## Project Hypothesis & Validation
+
+This study tested three specific hypotheses about healthcare insurance costs:
+
+### Hypothesis A: Smoking Impact on Costs
+
+**H₀:** Smokers and non-smokers have equal mean insurance charges (μ_smoker = μ_non-smoker)
+
+**H₁:** Smokers have higher mean insurance charges than non-smokers (μ_smoker > μ_non-smoker)
+
+**Test:** Welch's t-test (robust to unequal variances)
+
+**Results:**
+- **Test Statistic:** t = 32.74
+- **P-Value:** < 0.001 (highly significant)
+- **Effect Size:** Smokers pay $23,615 more on average ($32,050 vs. $8,434)
+- **Decision:** ✅ REJECT H₀ - Strong evidence that smoking significantly increases insurance costs
+
+**Business Implication:** Smoking is the single strongest driver of insurance costs, justifying differential pricing and smoking cessation program investments.
+
+---
+
+### Hypothesis B: Regional Cost Differences
+
+**H₀:** All four regions have equal mean insurance charges
+
+**H₁:** At least one region has different mean insurance charges
+
+**Test:** One-way ANOVA
+
+**Results:**
+- **Test Statistic:** F = 2.93
+- **P-Value:** 0.033 (statistically significant at α = 0.05)
+- **Regional Means:** Southeast ($14,735) is highest, Southwest ($12,347) is lowest
+- **Effect Size:** Modest ($2,388 difference between highest/lowest)
+- **Decision:** ✅ REJECT H₀ - Evidence of regional differences, though effect size is smaller than smoker impact
+
+**Business Implication:** Regional variations exist but are modest; suggests localized healthcare cost factors (e.g., provider density, cost of living).
+
+---
+
+### Hypothesis C: BMI Impact (Controlling for Confounders)
+
+**H₀:** BMI has no association with insurance charges when controlling for age, sex, smoker, children, and region
+
+**H₁:** BMI is positively associated with insurance charges even after controlling for other factors
+
+**Test:** OLS Multiple Regression
+
+**Results:**
+- **BMI Coefficient:** $339.25 per BMI unit increase
+- **P-Value:** < 0.001 (highly significant)
+- **Confidence Interval:** [323.8, 354.7] (tight bounds)
+- **Model R²:** 0.753 (controls explain 75.3% of variance)
+- **Decision:** ✅ REJECT H₀ - BMI remains a significant predictor independent of other factors
+
+**Business Implication:** BMI's independent effect justifies wellness programs targeting weight management, beyond just smoking cessation.
+
+---
+
+## Learning Journey & Reflections
+
+### Challenges Encountered
+
+**1. Directory Management & Project Structure**
+- **Challenge:** Maintaining organized file paths across notebooks, scripts, and dashboard
+- **Solution:** Adopted `pathlib` for cross-platform path handling and created v1/ subdirectories for versioning
+- **Learning:** Version control through folder structure (data/v1/, models/v1/) enables experimentation without breaking production code
+
+**2. Statistical Library Compatibility**
+- **Challenge:** `statsmodels` OLS regression failed with "ValueError: could not convert string to float" when using object dtypes
+- **Solution:** Added `.astype(float)` conversion before fitting OLS models
+- **Learning:** Type checking is critical when integrating multiple libraries; pandas infers types but doesn't always match downstream requirements
+
+**3. Windows Command-Line Execution**
+- **Challenge:** Direct `streamlit run` command failed in Git Bash on Windows
+- **Solution:** Used `python -m streamlit run` to invoke Streamlit as a module within the virtual environment
+- **Learning:** Module-based execution (`python -m`) is more portable across operating systems and shell environments
+
+**4. Stakeholder Communication**
+- **Challenge:** Initial dashboard used technical jargon (p-values, heteroscedasticity) unsuitable for non-technical stakeholders
+- **Solution:** Rewrote all descriptions with plain language, concrete examples, and business implications
+- **Learning:** Data science deliverables must be audience-appropriate; statistical rigor ≠ technical language
+
+**5. Matplotlib Import Errors**
+- **Challenge:** Importing `cm`, `Rectangle`, `Normalize` directly from `matplotlib` caused AttributeError
+- **Solution:** Used explicit submodule imports (`matplotlib.cm`, `matplotlib.patches.Rectangle`, `matplotlib.colors.Normalize`)
+- **Learning:** Python package structure matters; always check official documentation for correct import paths
+
+### Skills Developed
+
+**Technical:**
+- Statistical hypothesis testing (t-tests, ANOVA, OLS regression)
+- Machine learning pipelines with preprocessing (ColumnTransformer, OneHotEncoder)
+- Model validation (cross-validation, residual diagnostics, Q-Q plots)
+- Interactive dashboard development with Streamlit
+- Version control best practices (v1/ folder structure, .gitignore)
+
+**Analytical:**
+- Distinguishing statistical vs. practical significance
+- Interpreting p-values, confidence intervals, and effect sizes in business context
+- Balancing model complexity vs. interpretability (RandomForest vs. Linear Regression trade-offs)
+- Identifying confounding variables and implementing statistical controls
+
+**Communication:**
+- Translating technical findings into stakeholder-friendly language
+- Creating visualizations with clear titles, labels, and annotations
+- Structuring analysis narratives (hypotheses → tests → conclusions → business actions)
+
+### Adaptation Process
+
+This project required continuous adaptation of tools and methods:
+
+1. **Statistical Methods:** Started with simple t-tests, evolved to OLS regression with controls to address confounding
+2. **Machine Learning:** Initially explored Linear Regression, switched to RandomForest for better handling of non-linear relationships
+3. **Dashboard Design:** Iterated from basic charts to comprehensive 5-page navigation with business reflections
+4. **Documentation:** Progressed from code comments to formal README with hypothesis validation and methodology justification
+
+**Key Takeaway:** Data science projects are inherently iterative; each analysis step reveals new questions requiring methodological adjustments.
+
+---
+
+## Version Control & Project Management
+
+This project follows a structured version control approach:
+
+### Folder Structure Strategy
+
+**v1/ Subdirectories:** All data, models, and source code are organized under `v1/` folders:
+```
+data/v1/raw/          # Original unmodified datasets
+data/v1/processed/    # Cleaned, validated data
+models/v1/            # Trained model artifacts
+src/v1/               # Analysis scripts
+reports/v1/           # (Future) Generated reports
+```
+
+**Benefits:**
+1. **Experimentation Safety:** Future versions (v2/, v3/) can coexist without overwriting stable v1 outputs
+2. **Reproducibility:** Each version captures a complete snapshot of data → model → results
+3. **Rollback Capability:** If new methods fail, v1 remains functional
+4. **Auditability:** Stakeholders can reference specific version numbers in discussions
+
+### Git Workflow
+
+**Branch Strategy:**
+- `main` branch: Stable, tested code only
+- Feature branches: `feature/add-ols-regression`, `feature/streamlit-dashboard`
+- Development workflow: Create branch → commit changes → test → merge to main
+
+**Commit Best Practices:**
+- Descriptive commit messages: "Add BMI regression with age controls" (not "Update notebook")
+- Atomic commits: Each commit addresses one logical change
+- Regular commits: After each successful test or analysis milestone
+
+**Files Protected by .gitignore:**
+```
+.venv/               # Virtual environment (large, platform-specific)
+__pycache__/         # Python bytecode
+*.pyc
+.ipynb_checkpoints/  # Jupyter temp files
+.DS_Store           # MacOS metadata
+*.log               # Log files
+```
+
+This ensures the repository stays clean and only tracks essential project files.
+
+---
+
 ## Credits
 
 **Dataset:** [Kaggle - Healthcare Insurance Dataset](https://www.kaggle.com/datasets/willianoliveiragibin/healthcare-insurance)
 
 **Author:** Sergio Kadje (Code Institute Data Analytics Capstone Project 2)
 
-**Institution:** Code Institute
+**Institution:** Code Institute - LMS - Teachers
 
 **Date:** February 2026
 
