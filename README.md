@@ -88,10 +88,14 @@ Healthcare_insurance/
 ├── models/
 │   └── v1/
 │       └── insurance_model.joblib   # Trained RandomForest model
+├── reports/
+│   └── v1/
+│       └── figures/              # (Optional) Saved visualizations
 ├── src/
 │   └── v1/
 │       ├── etl.py                # Data extraction & cleaning
 │       └── train.py              # Model training script
+├── .gitignore                    # Version control exclusions
 ├── requirements.txt              # Python dependencies
 ├── setup.sh                      # Heroku setup script
 ├── Procfile                      # Heroku deployment config
@@ -240,10 +244,11 @@ The dashboard will open at `http://localhost:8501`
 
 **Dashboard Features:**
 
-The dashboard provides a comprehensive, stakeholder-friendly interface with 5 interactive pages:
+The dashboard provides a comprehensive, stakeholder-friendly interface with 6 interactive pages:
 
+- **📝 Executive Summary:** Complete overview of all findings, statistical proof, business impact, prioritized recommendations, and final verdict for stakeholders
 - **📊 Data Overview:** Dataset metrics, quality assessment, sample data, and detailed feature descriptions
-- **🔍 Exploratory Analysis:** 5 interactive visualizations with key findings and business reflections:
+- **📈 Exploratory Analysis:** 5 interactive visualizations with key findings and business reflections:
   - Charges distribution histogram (right-skewed pattern)
   - Smoker vs non-smoker charge comparison
   - BMI vs charges scatter plot (colored by smoker status)
@@ -261,7 +266,7 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 5 in
 - **🎯 Cost Predictor:** Interactive prediction tool with input form and similar profile analysis
 
 **Navigation Features:**
-- Top navigation map with 5 quick-access info boxes
+- Top navigation map with 6 quick-access info boxes
 - Sidebar page selector with emoji icons
 - Comprehensive descriptions and reflections on every page
 - All visualizations from the Jupyter notebook integrated
