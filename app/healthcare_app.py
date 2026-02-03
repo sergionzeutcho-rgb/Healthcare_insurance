@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from matplotlib.patches import Rectangle
+from matplotlib.colors import Normalize
 import seaborn as sns
 from pathlib import Path
 from scipy import stats
@@ -35,57 +38,57 @@ df = load_data()
 # Title and intro
 st.title("🏥 Healthcare Insurance Cost Analysis & Prediction")
 st.markdown("""
-This comprehensive dashboard provides statistical insights into healthcare insurance costs and enables 
-stakeholders to predict charges based on client attributes. Navigate through different sections using the menu below.
+**Welcome!** This dashboard helps you understand what drives healthcare insurance costs and 
+predicts charges for new customers. No statistics background needed - everything is explained in plain language!
 """)
 
 # Navigation Map at the top
-st.markdown("### 📍 Dashboard Navigation Map")
+st.markdown("### 🗯️ Quick Guide: What's Inside")
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
-    st.info("**📊 Overview**\nDataset summary & key metrics")
+    st.info("📊 **See the Data**\n\nWhat information we have")
 with col2:
-    st.info("**📈 EDA**\nExploratory visualizations")
+    st.info("📈 **Explore Patterns**\n\nVisual charts & trends")
 with col3:
-    st.info("**🔬 Statistics**\nHypothesis tests & findings")
+    st.info("🔍 **Test Results**\n\nWhat drives costs?")
 with col4:
-    st.info("**🤖 ML Model**\nModel performance & diagnostics")
+    st.info("🤖 **Our Model**\n\nHow accurate are we?")
 with col5:
-    st.info("**🎯 Predictor**\nInteractive cost estimation")
+    st.info("🎯 **Predict Costs**\n\nEstimate new cases")
 
 st.markdown("---")
 
 # Sidebar for navigation
-st.sidebar.title("📋 Navigation")
-page = st.sidebar.radio("Select Page:", [
-    "📊 Data Overview", 
-    "📈 Exploratory Analysis", 
-    "🔬 Statistical Tests",
-    "🤖 ML Model Performance",
-    "🎯 Cost Predictor"
+st.sidebar.title("� Menu")
+page = st.sidebar.radio("Choose a section:", [
+    "📊 See the Data", 
+    "📈 Explore Patterns", 
+    "🔍 Test Results",
+    "🤖 Our Model",
+    "🎯 Predict Costs"
 ])
 
 # ===== PAGE 1: DATA OVERVIEW =====
-if page == "📊 Data Overview":
-    st.header("📊 Dataset Overview")
+if page == "📊 See the Data":
+    st.header("📊 Understanding Our Insurance Data")
     
     st.markdown("""
-    ### About This Dataset
-    This analysis is based on 1,337 healthcare insurance policy records from Kaggle. 
-    The dataset includes demographic and health-related attributes that influence insurance costs.
+    **What is this?** We analyzed **1,337 real insurance policies** to understand what makes 
+    healthcare costs go up or down. This helps us predict costs for new customers and identify 
+    ways to help people save money.
     """)
     
     if df is not None:
         # Key Metrics
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total Records", f"{len(df):,}")
+            st.metric("📋 Total Policies", f"{len(df):,}", help="Number of insurance policies analyzed")
         with col2:
-            st.metric("Average Charge", f"${df['charges'].mean():,.0f}")
+            st.metric("💰 Typical Cost", f"${df['charges'].mean():,.0f}", help="Average insurance charge per person")
         with col3:
-            st.metric("Median Charge", f"${df['charges'].median():,.0f}")
+            st.metric("📈 Highest Cost", f"${df['charges'].max():,.0f}", help="Most expensive policy in our data")
         with col4:
-            st.metric("Max Charge", f"${df['charges'].max():,.0f}")
+            st.metric("📉 Lowest Cost", f"${df['charges'].min():,.0f}", help="Least expensive policy in our data")
         
         st.markdown("---")
         
@@ -235,7 +238,7 @@ elif page == "📈 Exploratory Analysis":
         
         st.markdown("---")
         
-        # 5. Charges by Region
+        # 5. Charges by Region with Geographic Map
         st.subheader("5️⃣ Average Charges by Region")
         st.markdown("""
         **Key Finding:** Regional differences exist but are modest compared to smoker status.
@@ -243,27 +246,82 @@ elif page == "📈 Exploratory Analysis":
         
         region_data = df.groupby('region')['charges'].agg(['mean', 'count']).sort_values('mean', ascending=False)
         
-        fig, ax = plt.subplots(figsize=(10, 5))
-        bars = ax.bar(region_data.index, region_data['mean'], color='steelblue', 
-                     edgecolor='black', alpha=0.7)
-        ax.set_ylabel('Average Charges ($)', fontsize=12)
-        ax.set_xlabel('Region', fontsize=12)
-        ax.set_title('Average Insurance Charges by Region', fontsize=14, fontweight='bold')
-        ax.grid(axis='y', alpha=0.3)
+        col1, col2 = st.columns([1, 1])
         
-        # Add value labels
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'${height:,.0f}',
-                   ha='center', va='bottom', fontweight='bold', fontsize=10)
-        st.pyplot(fig)
+        with col1:
+            # Geographic map visualization
+            fig_map, ax_map = plt.subplots(figsize=(10, 6))
+            
+            # Define region positions (approximate US regions)
+            regions_coords = {
+                'northwest': (0.25, 0.75),
+                'northeast': (0.75, 0.75),
+                'southwest': (0.25, 0.25),
+                'southeast': (0.75, 0.25)
+            }
+            
+            # Get colors based on charge values
+            charges_normalized = (region_data['mean'] - region_data['mean'].min()) / (region_data['mean'].max() - region_data['mean'].min())
+            
+            # Plot each region as a colored square
+            for region in regions_coords:
+                x, y = regions_coords[region]
+                if region in region_data.index:
+                    avg_charge = region_data.loc[region, 'mean']
+                    color_intensity = charges_normalized.loc[region]
+                    color = cm.Reds(0.3 + color_intensity * 0.6)
+                    
+                    # Draw region box
+                    rect = Rectangle((x-0.2, y-0.2), 0.4, 0.4, 
+                                        facecolor=color, edgecolor='black', linewidth=2)
+                    ax_map.add_patch(rect)
+                    
+                    # Add region name and charge
+                    ax_map.text(x, y+0.05, region.upper().replace('NORTH', 'N').replace('SOUTH', 'S'),
+                              ha='center', va='center', fontweight='bold', fontsize=11)
+                    ax_map.text(x, y-0.05, f'${avg_charge:,.0f}',
+                              ha='center', va='center', fontsize=10, color='darkred', fontweight='bold')
+            
+            ax_map.set_xlim(0, 1)
+            ax_map.set_ylim(0, 1)
+            ax_map.set_aspect('equal')
+            ax_map.axis('off')
+            ax_map.set_title('Geographic Distribution of Average Charges', 
+                           fontsize=14, fontweight='bold', pad=20)
+            
+            # Add colorbar legend
+            sm = cm.ScalarMappable(cmap=cm.Reds, 
+                                      norm=Normalize(vmin=region_data['mean'].min(), 
+                                                        vmax=region_data['mean'].max()))
+            sm.set_array([])
+            cbar = plt.colorbar(sm, ax=ax_map, orientation='horizontal', pad=0.05, aspect=30)
+            cbar.set_label('Average Charges ($)', fontsize=10)
+            
+            st.pyplot(fig_map)
+        
+        with col2:
+            # Bar chart
+            fig_bar, ax_bar = plt.subplots(figsize=(10, 6))
+            bars = ax_bar.bar(region_data.index, region_data['mean'], color='steelblue', 
+                         edgecolor='black', alpha=0.7)
+            ax_bar.set_ylabel('Average Charges ($)', fontsize=12)
+            ax_bar.set_xlabel('Region', fontsize=12)
+            ax_bar.set_title('Average Insurance Charges by Region', fontsize=14, fontweight='bold')
+            ax_bar.grid(axis='y', alpha=0.3)
+            
+            # Add value labels
+            for bar in bars:
+                height = bar.get_height()
+                ax_bar.text(bar.get_x() + bar.get_width()/2., height,
+                       f'${height:,.0f}',
+                       ha='center', va='bottom', fontweight='bold', fontsize=10)
+            st.pyplot(fig_bar)
         
         st.markdown(f"""
         **Reflection:** Southeast region has the highest average charges (${region_data.loc['southeast', 'mean']:,.0f}), 
         while Southwest has the lowest (${region_data.loc['southwest', 'mean']:,.0f}). 
         The difference is about **${region_data['mean'].max() - region_data['mean'].min():,.0f}**, 
-        which is modest compared to the smoker effect.
+        which is modest compared to the smoker effect. The geographic map shows regional variation across the US.
         """)
         
     else:
