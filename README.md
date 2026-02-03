@@ -71,7 +71,7 @@ This project provides a comprehensive analysis of healthcare insurance costs usi
 ```
 Healthcare_insurance/
 ├── app/
-│   └── streamlit_app.py          # Interactive dashboard application
+│   └── healthcare_app.py         # Interactive dashboard application
 ├── data/
 │   └── v1/
 │       ├── raw/
@@ -222,13 +222,13 @@ The notebook contains:
 Launch the interactive dashboard:
 
 ```bash
-streamlit run app/streamlit_app.py
+python -m streamlit run app/healthcare_app.py
 ```
 
-Or with the virtual environment:
+Or using the full path to Python in Windows:
 
 ```bash
-python -m streamlit run app/streamlit_app.py
+".venv/Scripts/python.exe" -m streamlit run app/healthcare_app.py
 ```
 
 The dashboard will open at `http://localhost:8501`
