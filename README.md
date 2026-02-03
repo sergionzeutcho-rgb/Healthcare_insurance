@@ -9,11 +9,13 @@ This project provides a comprehensive analysis of healthcare insurance costs usi
 **Dataset:** [Healthcare Insurance Dataset from Kaggle](https://www.kaggle.com/datasets/willianoliveiragibin/healthcare-insurance) (1,337 records)
 
 **Key Features:**
-- Statistical hypothesis testing (t-tests, ANOVA, regression)
+- Statistical hypothesis testing with comprehensive visualizations (t-tests, ANOVA, OLS regression)
 - Machine learning cost prediction (RandomForest with 88.4% R²)
-- Interactive Streamlit dashboard with prediction interface
-- Comprehensive exploratory data analysis (EDA)
-- Feature importance analysis and cross-validation
+- Interactive 5-page Streamlit dashboard with navigation map and all analyses integrated
+- Comprehensive exploratory data analysis (EDA) with 10+ visualizations
+- Feature importance analysis and 5-fold cross-validation
+- Model diagnostic plots (residuals, Q-Q plots, actual vs predicted)
+- Stakeholder-friendly interface with descriptions and business reflections
 
 ---
 
@@ -234,9 +236,32 @@ Or using the full path to Python in Windows:
 The dashboard will open at `http://localhost:8501`
 
 **Dashboard Features:**
-- **📊 Data Overview:** Dataset summary, distributions, and descriptive statistics
-- **🔬 Analysis Insights:** Hypothesis test results and key findings
-- **🎯 Cost Predictor:** Interactive form to predict insurance costs for new clients
+
+The dashboard provides a comprehensive, stakeholder-friendly interface with 5 interactive pages:
+
+- **📊 Data Overview:** Dataset metrics, quality assessment, sample data, and detailed feature descriptions
+- **🔍 Exploratory Analysis:** 5 interactive visualizations with key findings and business reflections:
+  - Charges distribution histogram (right-skewed pattern)
+  - Smoker vs non-smoker charge comparison
+  - BMI vs charges scatter plot (colored by smoker status)
+  - Correlation heatmap for numeric features
+  - Regional cost analysis
+- **🔬 Statistical Tests:** All 3 hypothesis tests with visualizations and statistical results:
+  - Hypothesis A: Smoker impact (Welch's t-test with boxplots)
+  - Hypothesis B: Regional differences (ANOVA with bar charts)
+  - Hypothesis C: BMI association (OLS regression with controlled variables)
+- **🤖 ML Model Performance:** Complete model diagnostics and insights:
+  - Performance metrics (R², MAE, RMSE, CV scores)
+  - Feature importance chart (top 11 features ranked)
+  - Diagnostic plots (actual vs predicted, residual analysis, distribution)
+  - Model validation assessment
+- **🎯 Cost Predictor:** Interactive prediction tool with input form and similar profile analysis
+
+**Navigation Features:**
+- Top navigation map with 5 quick-access info boxes
+- Sidebar page selector with emoji icons
+- Comprehensive descriptions and reflections on every page
+- All visualizations from the Jupyter notebook integrated
 
 ---
 
@@ -338,9 +363,10 @@ The dashboard will open at `http://localhost:8501`
 
 ### Dashboard Features
 - Add confidence intervals for predictions
-- Include partial dependence plots for feature effects
 - Enable batch predictions via CSV upload
-- Add cost reduction scenario analysis
+- Add partial dependence plots for feature effects
+- Add cost reduction scenario analysis (e.g., impact of smoking cessation)
+- Export functionality for reports and charts
 
 ---
 
@@ -348,11 +374,13 @@ The dashboard will open at `http://localhost:8501`
 
 **Dataset:** [Kaggle - Healthcare Insurance Dataset](https://www.kaggle.com/datasets/willianoliveiragibin/healthcare-insurance)
 
-**Author:** Sergi (Code Institute Data Analytics Capstone Project 2)
+**Author:** Sergio Kadje (Code Institute Data Analytics Capstone Project 2)
 
 **Institution:** Code Institute
 
 **Date:** February 2026
+
+**AI Assistance:** AI tools (GitHub Copilot) were used to assist with code generation, amendments, and enhancement of the Streamlit dashboard.
 
 ---
 
