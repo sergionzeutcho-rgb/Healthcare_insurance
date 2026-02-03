@@ -79,7 +79,7 @@ Healthcare_insurance/
 │       └── processed/
 │           └── insurance_clean.csv  # Cleaned dataset
 ├── jupyter_notebooks/
-│   └── Notebook_Template.ipynb   # Full analysis notebook
+│   └── healthcare_insurance.ipynb   # Full analysis notebook
 ├── models/
 │   └── v1/
 │       └── insurance_model.joblib   # Trained RandomForest model
@@ -205,7 +205,7 @@ python src/v1/train.py
 Open the analysis notebook:
 
 ```bash
-jupyter notebook jupyter_notebooks/Notebook_Template.ipynb
+jupyter notebook jupyter_notebooks/healthcare_insurance.ipynb
 ```
 
 The notebook contains:
