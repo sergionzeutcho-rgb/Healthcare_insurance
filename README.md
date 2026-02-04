@@ -347,7 +347,7 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 6 in
 
 ✅ **Low Prediction Error:** MAE of $2,549 means average prediction is within ~$2,500 of actual cost
 
-✅ **Well-Calibrated:** Residual plots show minimal bias, though some heteroscedasticity exists for high-charge cases (expected for insurance data)
+✅ **Well-Calibrated:** Residual plots show minimal bias, though some heteroscedasticity (non-constant variance) exists for high-charge cases (expected for insurance data)
 
 ### Business Insights
 
