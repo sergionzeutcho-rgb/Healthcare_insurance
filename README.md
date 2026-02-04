@@ -84,7 +84,7 @@ Healthcare_insurance/
 │       └── processed/
 │           └── insurance_clean.csv  # Cleaned dataset
 ├── jupyter_notebooks/
-│   └── healthcare_insurance.ipynb   # Full analysis notebook
+│   └── Healthcare_insurance.ipynb   # Full analysis notebook
 ├── models/
 │   └── v1/
 │       └── insurance_model.joblib   # Trained RandomForest model
@@ -96,10 +96,12 @@ Healthcare_insurance/
 │       ├── etl.py                # Data extraction & cleaning
 │       └── train.py              # Model training script
 ├── .gitignore                    # Version control exclusions
-├── requirements.txt              # Python dependencies
-├── setup.sh                      # Heroku setup script
+├── .python-version               # Python version specification for Heroku
+├── .slugignore                   # Heroku slug exclusions
 ├── Procfile                      # Heroku deployment config
-└── README.md                     # Project documentation
+├── README.md                     # Project documentation
+├── requirements.txt              # Python dependencies
+└── setup.sh                      # Heroku setup script
 ```
 
 ---
