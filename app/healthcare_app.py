@@ -42,7 +42,7 @@ df = load_data()
 st.title("🏥 Healthcare Insurance Cost Analysis & Prediction")
 st.markdown("""
 **Welcome!** This dashboard helps you understand what drives healthcare insurance costs and 
-predicts charges for new customers. No statistics background needed - everything is explained in plain language!
+predicts charges for new customers. No statistics background needed. Everything is explained in plain language!
 """)
 
 # Navigation Map at the top
@@ -135,7 +135,7 @@ if page == "📝 Executive Summary":
                        f'${height:,.0f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
             st.pyplot(fig)
     
-    st.success("✅ **RECOMMENDATION:** Invest heavily in smoking cessation programs - this is your highest-impact initiative.")
+    st.success("✅ **RECOMMENDATION:** Invest heavily in smoking cessation programs; this is your highest-impact initiative.")
     
     st.markdown("---")
     
@@ -186,7 +186,7 @@ if page == "📝 Executive Summary":
     with col1:
         st.markdown("""
         **What We Found:**
-        - Regional differences are **statistically significant** BUT small in magnitude
+        - Regional differences are **statistically significant** but small in magnitude
         - Southeast region: $14,735 average (highest)
         - Southwest region: $12,347 average (lowest)
         - Difference: Only **$2,388** between highest and lowest regions
@@ -245,6 +245,18 @@ if page == "📝 Executive Summary":
         - Ready for production use
         """)
     
+    st.info("""
+    **Understanding the $2,549 Error Metric:**
+    
+    This Mean Absolute Error (MAE) represents the average prediction error across all estimates. 
+    Given that insurance costs in our dataset range from \$1,122 to \$63,770 (average: \$13,270), 
+    a \$2,549 error translates to approximately 19% average deviation. 
+    
+    This performance is acceptable considering the model uses only six basic demographic and health 
+    attributes, whereas comprehensive insurance underwriting typically incorporates dozens of factors 
+    including detailed medical history, genetic predispositions, and lifestyle behaviors.
+    """)
+    
     st.success("✅ **VERDICT:** The model is highly accurate and reliable for business decisions and cost predictions.")
     
     st.markdown("---")
@@ -260,7 +272,7 @@ if page == "📝 Executive Summary":
     - Provide financial incentives for quitting (premium discounts)
     - Partner with healthcare providers for nicotine replacement therapy
     
-    **Expected ROI:** Highest - every successful quit saves ~$23,600/year
+    **Expected ROI:** Highest; every successful quit saves ~$23,600/year
     
     ---
     
@@ -271,7 +283,7 @@ if page == "📝 Executive Summary":
     - Nutrition counseling programs
     - Financial incentives for BMI reduction
     
-    **Expected ROI:** High - 10-point BMI reduction = $3,390 savings/year
+    **Expected ROI:** High; 10-point BMI reduction = $3,390 savings/year
     
     ---
     
@@ -281,7 +293,7 @@ if page == "📝 Executive Summary":
     - Minor premium adjustments by region
     - Focus on Southeast (highest costs) vs Southwest (lowest)
     
-    **Expected ROI:** Modest - helps with competitive pricing but won't dramatically reduce costs
+    **Expected ROI:** Modest; helps with competitive pricing but won't dramatically reduce costs
     
     ---
     
@@ -292,7 +304,7 @@ if page == "📝 Executive Summary":
     - Identify high-risk customers for early intervention
     - Monitor actual vs predicted costs for continuous improvement
     
-    **Expected ROI:** High - enables targeted interventions and accurate pricing
+    **Expected ROI:** High; enables targeted interventions and accurate pricing
     """)
     
     st.markdown("---")
@@ -373,7 +385,7 @@ elif page == "📊 See the Data":
             "children": "Number of children/dependents (0-5)",
             "smoker": "Smoking status (yes/no)",
             "region": "Geographic region (northeast, northwest, southeast, southwest)",
-            "charges": "Medical insurance costs - TARGET VARIABLE ($1,122-$63,770)"
+            "charges": "Medical insurance costs - TARGET VARIABLE (range: \$1,122 to \$63,770)"
         }
         for feat, desc in feature_desc.items():
             st.markdown(f"**`{feat}`**: {desc}")
@@ -393,8 +405,8 @@ elif page == "📈 Explore Patterns":
         # 1. Charges Distribution
         st.subheader("1️⃣ Distribution of Insurance Charges")
         st.markdown("""
-        **Key Finding:** Charges are right-skewed with most policyholders paying between $1,000-$20,000, 
-        but some high-cost cases extend beyond $60,000.
+        **Distribution pattern:** The majority of policyholders pay between \$1,000 and \$20,000 annually, 
+        though a subset of cases exceed \$60,000. These high-cost outliers influence the overall average.
         """)
         
         fig, ax = plt.subplots(figsize=(10, 5))
@@ -406,16 +418,17 @@ elif page == "📈 Explore Patterns":
         st.pyplot(fig)
         
         st.markdown("""
-        **💭 What This Means:** A few high-cost cases (likely smokers or people with health issues) 
-        drive up the average cost for everyone. If we can help these people, we can reduce overall costs.
+        **Strategic implication:** High-cost cases are predominantly associated with smokers and individuals with 
+        significant health conditions. Targeted interventions such as smoking cessation programs and comprehensive 
+        wellness support could substantially reduce aggregate costs across the policy portfolio.
         """)
         
         st.markdown("---")
         
         # 2. Charges by Smoker
-        st.subheader("2️⃣ Smokers vs Non-Smokers: The Big Difference")
+        st.subheader("2️⃣ Smoker Status Impact")
         st.markdown("""
-        **💡 What This Shows:** This compares the average cost for smokers versus non-smokers.
+        **Comparative analysis:** The following chart illustrates average costs for smokers versus non-smokers.
         """)
         
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -434,19 +447,24 @@ elif page == "📈 Explore Patterns":
                    ha='center', va='bottom', fontweight='bold')
         st.pyplot(fig)
         
+        non_smoker_avg = smoker_data['no']
+        smoker_avg = smoker_data['yes']
+        difference = smoker_avg - non_smoker_avg
+        pct_more = (difference / non_smoker_avg * 100)
+        
         st.markdown(f"""
-        **Reflection:** Non-smokers average **${smoker_data['no']:,.0f}** while smokers average 
-        **${smoker_data['yes']:,.0f}** - a difference of **${smoker_data['yes'] - smoker_data['no']:,.0f}** 
-        or **{((smoker_data['yes'] - smoker_data['no']) / smoker_data['no'] * 100):.1f}%** higher.
-        This validates smoking as the primary cost driver.
+        **Analysis:** Non-smokers pay approximately \${non_smoker_avg:,.0f} on average, while smokers 
+        pay \${smoker_avg:,.0f}. This represents a difference of \${difference:,.0f}, 
+        meaning smokers pay {pct_more:.1f}% more. 
+        These findings confirm that smoking is the primary factor driving increased insurance costs.
         """)
         
         st.markdown("---")
         
         # 3. BMI vs Charges
-        st.subheader("3️⃣ BMI vs Charges Relationship")
+        st.subheader("3️⃣ BMI and Cost Relationship")
         st.markdown("""
-        **Key Finding:** Higher BMI correlates with higher charges, especially for smokers.
+        **Findings:** Higher BMI values correlate with increased charges, with this effect being particularly pronounced among smokers.
         """)
         
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -464,9 +482,9 @@ elif page == "📈 Explore Patterns":
         st.pyplot(fig)
         
         st.markdown("""
-        **Reflection:** The scatter plot reveals a positive correlation between BMI and charges, 
-        with smokers (coral points) concentrated in the high-charge region regardless of BMI. 
-        This suggests an **interaction effect** between smoking and BMI.
+        **Interpretation:** The scatter plot reveals that smokers (coral points) are concentrated in the higher charge regions 
+        regardless of BMI. Additionally, as BMI increases, costs tend to rise for both groups. This suggests an interaction 
+        effect where both factors contribute to elevated costs, with combined impact exceeding individual effects.
         """)
         
         st.markdown("---")
@@ -474,7 +492,7 @@ elif page == "📈 Explore Patterns":
         # 4. Correlation Matrix
         st.subheader("4️⃣ Correlation Matrix (Numeric Variables)")
         st.markdown("""
-        **Key Finding:** Age and BMI show positive correlations with charges.
+        **What we found:** Age and BMI both show positive connections with charges.
         """)
         
         numeric_cols = ['age', 'bmi', 'children', 'charges']
@@ -487,11 +505,11 @@ elif page == "📈 Explore Patterns":
         st.pyplot(fig)
         
         st.markdown("""
-        **Reflection:** 
-        - **Age** shows moderate positive correlation (0.299) with charges
-        - **BMI** shows weak positive correlation (0.198) with charges  
-        - **Children** shows very weak correlation (0.068), suggesting it's less important
-        - Note: Smoker status (categorical) is not shown but is the strongest predictor
+        **Interpretation:** 
+        - **Age:** Demonstrates moderate positive correlation (0.299) with charges; older policyholders tend to incur higher costs
+        - **BMI:** Shows weaker positive correlation (0.198), though still statistically meaningful  
+        - **Children:** Exhibits minimal correlation (0.068), suggesting number of dependents has limited impact on costs
+        - Note: Smoking status (categorical variable) is not represented in this matrix but remains the strongest cost predictor
         """)
         
         st.markdown("---")
@@ -575,11 +593,15 @@ elif page == "📈 Explore Patterns":
                        ha='center', va='bottom', fontweight='bold', fontsize=10)
             st.pyplot(fig_bar)
         
+        se_charges = region_data.loc['southeast', 'mean']
+        sw_charges = region_data.loc['southwest', 'mean']
+        regional_diff = region_data['mean'].max() - region_data['mean'].min()
+        
         st.markdown(f"""
-        **Reflection:** Southeast region has the highest average charges ($`{region_data.loc['southeast', 'mean']:,.0f}`), 
-        while Southwest has the lowest ($`{region_data.loc['southwest', 'mean']:,.0f}`). 
-        The difference is about **$`{region_data['mean'].max() - region_data['mean'].min():,.0f}`**, 
-        which is modest compared to the smoker effect. The geographic map shows regional variation across the US.
+        **Key findings:** The Southeast region has the highest average charges at \${se_charges:,.0f}, 
+        while the Southwest has the lowest at \${sw_charges:,.0f}. 
+        This represents a difference of approximately \${regional_diff:,.0f}, which is 
+        relatively modest when compared to the substantial impact of smoking status.
         """)
         
     else:
@@ -590,11 +612,11 @@ elif page == "🔍 Test Results":
     st.header("🔍 What Really Drives Insurance Costs?")
     
     st.markdown("""
-    **What are these tests?** Think of these as scientific proof. We're not just guessing - 
-    we used proven mathematical methods to confirm what really affects insurance costs.
+    **Methodology:** Rather than relying on observational analysis alone, we conducted rigorous statistical tests
+    to validate our findings. These tests provide scientific evidence for the relationships identified in the data.
     
-    ✅ **What you need to know:** When we say "significant," it means the pattern is real, 
-    not just random chance. Our confidence level is 95% or higher.
+    ✅ **Significance threshold:** Results marked as "statistically significant" indicate at least 95% confidence 
+    that observed patterns represent genuine relationships rather than random variation.
     """)
     
     if df is not None:
@@ -605,13 +627,12 @@ elif page == "🔍 Test Results":
         
         with col1:
             st.markdown("""
-            **What We Asked:** Is there really a difference between smokers and non-smokers, 
-            or could it just be coincidence?
+            **Research question:** Do smokers incur significantly higher costs, or could observed differences be attributed to sampling variation?
             
-            **The Answer:** It's REAL. Smokers cost significantly more.
+            **Finding:** The analysis confirms that smokers demonstrate substantially higher insurance costs with statistical certainty.
             
-            **Why It Matters:** Smoking is the #1 driver of high insurance costs. 
-            Smoking cessation programs could save millions.
+            **Business implication:** Smoking represents the single largest driver of elevated insurance costs. 
+            Investment in smoking cessation programs presents the highest potential return on intervention spending.
             """)
             
             # Perform test
@@ -648,12 +669,13 @@ elif page == "🔍 Test Results":
         
         with col1:
             st.markdown("""
-            **What We Asked:** Do people in different parts of the country pay different amounts?
+            **Research question:** Does geographic location significantly influence insurance costs?
             
-            **The Answer:** Yes, but the differences are small.
+            **Finding:** Regional differences are statistically significant, though the magnitude of variation is modest.
             
-            **Why It Matters:** Where you live affects your costs a little, but nowhere near 
-            as much as smoking or health factors.
+            **Business implication:** While location does affect costs, the impact is substantially smaller 
+            than behavioral and health-related factors. Regional pricing adjustments may be warranted but should not 
+            be prioritized over health intervention programs.
             """)
             
             # Perform test
@@ -687,24 +709,23 @@ elif page == "🔍 Test Results":
         st.subheader("⚖️ Question 3: Does Weight Affect Costs?")
         
         st.markdown("""
-        **What We Asked:** After accounting for age, smoking, and other factors, does BMI 
-        (Body Mass Index - a measure of weight relative to height) still matter?
+        **Research question:** After controlling for age, smoking status, and other variables, does BMI maintain an independent effect on costs?
         
-        **The Answer:** Yes! Each point increase in BMI adds about $339 to annual costs.
+        **Finding:** Yes. Each single-point increase in BMI corresponds to approximately $339 in additional annual costs.
         
-        **Why It Matters:** Weight management programs could help reduce costs, even after 
-        we account for smoking and age.
+        **Business implication:** BMI demonstrates independent predictive value beyond other risk factors. 
+        Weight management and wellness programs represent viable cost-reduction strategies with measurable financial impact.
         """)
         
         col1, col2 = st.columns(2)
         with col1:
             st.success("""
-            **📈 The Numbers:**
+            **📈 Statistical Evidence:**
             - **Impact:** $339 per BMI point
             - **Confidence:** 99.9%+
             - **Conclusion:** ✅ **CONFIRMED**
             
-            BMI matters! Higher weight means higher costs, even when we control for everything else.
+            BMI demonstrates independent predictive value. Higher BMI corresponds to increased costs across all other control variables.
             """)
         
         with col2:
@@ -735,22 +756,22 @@ elif page == "🔍 Test Results":
         st.pyplot(fig)
         
         st.markdown("""
-        **💡 What This Shows:** The chart clearly shows that BMI affects costs for both smokers 
-        and non-smokers. Higher BMI consistently means higher charges, regardless of smoking status.
+        **Interpretation:** The positive relationship between BMI and insurance charges holds across both smoker categories. 
+        Elevated BMI consistently correlates with increased costs, independent of smoking status.
         """)
         
         st.markdown("""
         ---
-        ### 💡 Summary: What We Learned
+        ### 💡 Summary of Statistical Findings
         
-        Our scientific tests confirmed three key findings:
+        Our hypothesis testing confirmed three key cost drivers:
         
-        1. **🚬 Smoking** is the #1 cost driver (biggest impact by far)
-        2. **🗺️ Location** has a small effect on costs
-        3. **⚖️ Weight (BMI)** matters independently - about $339 per point
+        1. **🚬 Smoking status** represents the primary cost determinant (largest effect size)
+        2. **🗺️ Geographic region** demonstrates statistically significant but modest impact
+        3. **⚖️ Body Mass Index (BMI)** maintains independent predictive value at approximately $339 per point
         
-        **🎯 Action Items:** Focus on smoking cessation programs first, then weight management. 
-        Regional pricing adjustments could help but will have less impact.
+        **Strategic recommendations:** Prioritize smoking cessation programs for maximum impact, followed by 
+        weight management initiatives. Regional pricing adjustments may be considered but offer lower return potential.
         """)
     
     else:
@@ -764,7 +785,7 @@ elif page == "🤖 Our Model":
     **What is this?** We built a computer model (think of it like a smart calculator) that 
     predicts insurance costs based on a person's information. This page shows how accurate it is.
     
-    🎯 **Bottom Line:** Our model is **88.4% accurate** - that's really good!
+    🎯 **Bottom Line:** Our model is **88.4% accurate**, that's really good for our model.
     """)
     
     if model is not None and df is not None:
@@ -781,7 +802,7 @@ elif page == "🤖 Our Model":
         st.markdown("---")
         
         # Performance Metrics
-        st.subheader("� How Accurate Is It?")
+        st.subheader("📊 How Accurate Is It?")
         
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -794,11 +815,39 @@ elif page == "🤖 Our Model":
             st.metric("Consistency Check", "83.9%", help="Model performs consistently on new data")
         
         st.success("""
-        **💡 What This Means:** 
-        - Our model is **highly accurate** (88.4%)
-        - Predictions are typically within **$2,500** of actual costs
-        - The model is **reliable** and works well on new cases (83.9% on validation)
-        - No signs of overfitting or bias
+        **Performance metrics:** 
+        - Model accuracy: 88.4%, indicating strong explanatory power
+        - Mean prediction error: approximately $2,500
+        - Validation accuracy: 83.9% on previously unseen data, confirming model reliability
+        - No evidence of overfitting or systematic bias detected
+        """)
+        
+        st.info("""
+        **Understanding the Mean Absolute Error (MAE) of $2,549:**
+        
+        This metric represents the average absolute difference between predicted and actual costs.
+        
+        **Context:**
+        - Insurance costs range: \$1,122 to \$63,770 in our dataset
+        - Average cost: approximately \$13,270
+        - MAE as percentage: approximately 19% of average cost
+        
+        **Why this level of error?**
+        
+        The model uses only six readily available attributes (age, sex, BMI, children, smoker status, region). 
+        Real-world insurance underwriting incorporates dozens of additional factors including:
+        - Comprehensive medical history
+        - Pre-existing conditions
+        - Genetic predispositions
+        - Detailed lifestyle factors
+        - Occupational hazards
+        - Family health history
+        
+        **Business perspective:**
+        
+        This error rate is acceptable for preliminary cost estimation and risk stratification. 
+        The model successfully identifies the primary cost drivers (smoking, BMI) while maintaining 
+        computational efficiency for real-time predictions.
         """)
         
         st.markdown("---")
@@ -807,8 +856,8 @@ elif page == "🤖 Our Model":
         st.subheader("🎯 What Matters Most?")
         
         st.markdown("""
-        This chart shows which factors have the biggest impact on our predictions. 
-        Think of it as a ranking of importance.
+        **Feature importance analysis:** This chart ranks predictor variables by their relative contribution to model predictions. 
+        Longer bars indicate stronger influence on cost forecasts.
         """)
         
         # Extract feature importance (simulated for display)
@@ -834,94 +883,173 @@ elif page == "🤖 Our Model":
         - **🎂 Age** has moderate impact (14%)
         - **🗺️ Location/region** barely matters (less than 3%)
         
-        **🎯 Business Insight:** Focus resources on smoking cessation and weight management programs - 
+        **🎯 Business Insight:** Focus resources on smoking cessation and weight management programs;
         these drive the biggest cost differences. Don't worry too much about regional variations.
         """)
-        
+
         st.markdown("---")
-        
-        # Model Diagnostics (Simulated)
-        st.subheader("� Quality Checks: Is Our Model Reliable?")
-        
+
+        # Model Diagnostics - REAL MODEL PREDICTIONS (Section 6)
+        st.subheader("🔬 Model Diagnostic Plots (Section 6)")
+
         st.markdown("""
-        These charts check if our model is working properly. We're looking for specific patterns 
-        that tell us the model is trustworthy.
+        **What are these?** These are the same diagnostic plots from Section 6 of the analysis notebook.
+        They use **actual model predictions** from the trained RandomForest to validate performance.
         """)
-        
-        # Create diagnostic plots layout
-        tab1, tab2, tab3 = st.tabs(["Actual vs Predicted", "Residual Plot", "Residual Distribution"])
-        
-        with tab1:
-            st.markdown("**Shows how close our predictions are to reality**")
-            fig, ax = plt.subplots(figsize=(8, 6))
-            # Simulated data for demo
-            np.random.seed(42)
-            y_test = np.array(df['charges'].sample(200, random_state=42).values)
-            y_pred = y_test + np.random.normal(0, 3000, len(y_test))
-            
-            ax.scatter(y_test, y_pred, alpha=0.5, s=30, color='steelblue', edgecolors='black')
-            ax.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
-                   'r--', lw=2, label='Perfect Prediction')
-            ax.set_xlabel('Actual Charges ($)', fontsize=12)
-            ax.set_ylabel('Predicted Charges ($)', fontsize=12)
-            ax.set_title('Actual vs Predicted Values', fontsize=13, fontweight='bold')
-            ax.legend()
-            ax.grid(alpha=0.3)
-            st.pyplot(fig)
-            
-            st.info("✅ **What this shows:** Points near the red line = good predictions. Our model does well!")
-        
-        with tab2:
-            st.markdown("**Checks if we consistently over or under-predict**")
-            residuals = y_test - y_pred
-            fig, ax = plt.subplots(figsize=(8, 6))
-            ax.scatter(y_pred, residuals, alpha=0.5, s=30, color='coral', edgecolors='black')
-            ax.axhline(y=0, color='r', linestyle='--', lw=2)
-            ax.set_xlabel('Predicted Charges ($)', fontsize=12)
-            ax.set_ylabel('Prediction Error ($)', fontsize=12)
-            ax.set_title('Error Analysis', fontsize=13, fontweight='bold')
-            ax.grid(alpha=0.3)
-            st.pyplot(fig)
-            
-            st.info("✅ **What this shows:** Random scatter around zero = no bias. Our model is fair!")
-        
-        with tab3:
-            st.markdown("**Shows the pattern of our prediction errors**")
-            fig, ax = plt.subplots(figsize=(8, 5))
-            ax.hist(residuals, bins=30, color='lightgreen', edgecolor='black', alpha=0.7)
-            ax.set_xlabel('Prediction Error ($)', fontsize=12)
-            ax.set_ylabel('Frequency', fontsize=12)
-            ax.set_title('Distribution of Errors', fontsize=13, fontweight='bold')
-            ax.grid(axis='y', alpha=0.3)
-            st.pyplot(fig)
-            
-            st.info("✅ **What this shows:** Bell-shaped curve centered near zero = model works as expected!")
-        
+
+        # Generate real predictions from the model
+        feature_cols = ["age", "sex", "bmi", "children", "smoker", "region"]
+        X = df[feature_cols].copy()
+        y = df["charges"].copy()
+
+        # Use same random state as training for consistency
+        from sklearn.model_selection import train_test_split
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+
+        # Get actual predictions from loaded model
+        y_pred = model.predict(X_test)
+        residuals = y_test - y_pred
+
+        # Calculate metrics
+        from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+        mae = mean_absolute_error(y_test, y_pred)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+        r2 = r2_score(y_test, y_pred)
+
+        # Display 2x2 diagnostic grid (same as notebook Section 6)
+        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        fig.suptitle('Regression Model Diagnostics (Section 6)', fontsize=16, fontweight='bold')
+
+        # 1. Actual vs Predicted
+        axes[0, 0].scatter(y_test, y_pred, alpha=0.5, s=20, color='steelblue', edgecolors='black')
+        axes[0, 0].plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 
+                       'r--', lw=2, label='Perfect Prediction')
+        axes[0, 0].set_xlabel('Actual Charges ($)', fontsize=10)
+        axes[0, 0].set_ylabel('Predicted Charges ($)', fontsize=10)
+        axes[0, 0].set_title('Actual vs Predicted', fontweight='bold')
+        axes[0, 0].legend()
+        axes[0, 0].grid(True, alpha=0.3)
+
+        # 2. Residuals vs Predicted
+        axes[0, 1].scatter(y_pred, residuals, alpha=0.5, s=20, color='coral', edgecolors='black')
+        axes[0, 1].axhline(y=0, color='r', linestyle='--', lw=2)
+        axes[0, 1].set_xlabel('Predicted Charges ($)', fontsize=10)
+        axes[0, 1].set_ylabel('Residuals ($)', fontsize=10)
+        axes[0, 1].set_title('Residuals vs Predicted', fontweight='bold')
+        axes[0, 1].grid(True, alpha=0.3)
+
+        # 3. Residuals Distribution
+        axes[1, 0].hist(residuals, bins=30, edgecolor='black', alpha=0.7, color='lightgreen')
+        axes[1, 0].set_xlabel('Residuals ($)', fontsize=10)
+        axes[1, 0].set_ylabel('Frequency', fontsize=10)
+        axes[1, 0].set_title('Distribution of Residuals', fontweight='bold')
+        axes[1, 0].grid(True, alpha=0.3, axis='y')
+
+        # 4. Q-Q Plot
+        from scipy import stats as scipy_stats
+        scipy_stats.probplot(residuals, dist="norm", plot=axes[1, 1])
+        axes[1, 1].set_title('Q-Q Plot', fontweight='bold')
+        axes[1, 1].grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        st.pyplot(fig)
+
+        # Performance Summary
+        st.info(f"""
+        **📊 Model Performance Summary:**
+        - **MAE:**  ${mae:,.2f} - On average, predictions are off by this amount
+        - **RMSE:** ${rmse:,.2f} - Typical prediction error (penalizes large errors more)
+        - **R²:**   {r2:.4f} ({r2*100:.2f}%) - Model explains {r2*100:.1f}% of cost variation
+        """)
+
+        st.markdown("---")
+
+        # Comprehensive Interpretation (from notebook)
+        st.subheader("📖 Interpretation of Regression Diagnostics")
+
+        with st.expander("🔍 Click to read detailed interpretation", expanded=False):
+            st.markdown(f"""
+            ### Model Approach Validation
+
+            **Regression for continuous charges:**
+            - Insurance charges are continuous dollar amounts ranging from approximately \$1,100 to approximately \$63,770
+            - This makes supervised regression the appropriate approach rather than classification
+
+            **Feature set justification:**
+            - The model uses six client attributes (age, sex, BMI, children, smoker, region)
+            - These are readily available at policy application time
+            - Enables real-time cost estimation for stakeholders
+
+            **RandomForest advantage:**
+            - Handles non-linear relationships (e.g., BMI-smoker interaction effects)
+            - Naturally accommodates mixed data types (numeric + categorical)
+            - No manual feature engineering required
+
+            **Pipeline design:**
+            - Wraps preprocessing (OneHotEncoding) and modeling in a Pipeline
+            - Ensures transformations are learned only from training data
+            - Applied consistently to test data, preventing data leakage
+
+            ---
+
+            ### Plot Interpretations
+
+            **📊 Actual vs Predicted Plot:**
+            - Points close to the red diagonal line indicate accurate predictions
+            - The scatter shows the model captures the general trend well, particularly for lower charges (range: \$5,000 to \$30,000)
+            - Smokers (high charges) show more spread, suggesting the model struggles slightly with extreme values
+            - Overall fit remains strong (R² = {r2:.4f})
+
+            **📈 Residuals vs Predicted Plot:**
+            - Residuals should be randomly scattered around the zero line with no clear pattern
+            - Most residuals cluster near zero, confirming unbiased predictions
+            - Some heteroscedasticity is visible (wider spread at higher predictions)
+            - This is expected in insurance data where higher charges have greater variability
+
+            **📊 Distribution of Residuals:**
+            - The histogram shows residuals are approximately centered at zero with slight right skew
+            - This is typical for real-world data; the left tail is bounded at negative values while the right tail extends further
+            - The roughly bell-shaped distribution suggests the normality assumption is reasonably satisfied
+
+            **📐 Q-Q Plot:**
+            - Points closely follow the red line in the center range, indicating residuals are approximately normally distributed
+            - Deviation at the extremes (especially upper tail) reflects the skewness visible in the residuals histogram
+            - This is acceptable for regression; moderate deviations from normality don't substantially impact predictions
+
+            ---
+
+            ### Overall Assessment
+
+            ✅ **The Random Forest model demonstrates strong predictive performance:**
+            - MAE of ${mae:,.0f} - typical prediction error
+            - R² of {r2:.4f} - explains {r2*100:.1f}% of charge variance
+            - The model is suitable for the dashboard prototype and stakeholder-facing cost estimation tool
+            - Diagnostic plots confirm the model is well-calibrated with no major systematic biases
+            """)
+
         st.markdown("""
         ---
         ### 🏆 Final Verdict: Can We Trust This Model?
-        
+
         **YES!** Our prediction model is:
         - ✅ **Highly Accurate** (88.4% accuracy)
         - ✅ **Reliable** (consistent on new data)
         - ✅ **Unbiased** (no systematic errors)
         - ✅ **Aligned with Reality** (smoking and BMI matter most, just like our tests showed)
-        
-        **🎯 Ready for Business Use:** This model can confidently predict insurance costs for new 
+
+        **🎯 Ready for Business Use:** This model can confidently predict insurance costs for new
         customers and help identify high-risk cases for intervention programs.
         """)
-    
-    else:
-        st.error("⚠️ Model or data not found.")
 
-# ===== PAGE 5: COST PREDICTOR =====
 elif page == "🎯 Predict Costs":
     st.header("🎯 Predict Insurance Costs for New Customers")
     
     if model is not None:
         st.markdown("""
-        **How to use this:** Fill in the information below for a new customer, and we'll estimate 
-        their annual insurance cost. The prediction is based on our 88.4% accurate model.
+        **Cost estimation tool:** Enter policyholder information below to generate a cost estimate. 
+        Predictions are based on the validated model with 88.4% accuracy.
         """)
         
         col1, col2 = st.columns(2)
