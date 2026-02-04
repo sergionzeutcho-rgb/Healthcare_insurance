@@ -11,11 +11,14 @@ This project provides a comprehensive analysis of healthcare insurance costs usi
 **Key Features:**
 - Statistical hypothesis testing with comprehensive visualizations (t-tests, ANOVA, OLS regression)
 - Machine learning cost prediction (RandomForest with 88.4% R²)
-- Interactive 5-page Streamlit dashboard with navigation map and all analyses integrated
+- **Interactive 6-page Streamlit dashboard with real-time data filtering**
+- **Dynamic charts that update based on user-selected filters (age, gender, smoker, region, BMI, children)**
 - Comprehensive exploratory data analysis (EDA) with 10+ visualizations
+- Geographic heat map for regional cost analysis
 - Feature importance analysis and 5-fold cross-validation
 - Model diagnostic plots (residuals, Q-Q plots, actual vs predicted)
 - Stakeholder-friendly interface with descriptions and business reflections
+- Robust error handling for all filter combinations and edge cases
 
 ---
 
@@ -250,12 +253,16 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 6 in
 
 - **📝 Executive Summary:** Complete overview of all findings, statistical proof, business impact, prioritized recommendations, and final verdict for stakeholders
 - **📊 Data Overview:** Dataset metrics, quality assessment, sample data, and detailed feature descriptions
-- **📈 Exploratory Analysis:** 5 interactive visualizations with key findings and business reflections:
-  - Charges distribution histogram (right-skewed pattern)
-  - Smoker vs non-smoker charge comparison
-  - BMI vs charges scatter plot (colored by smoker status)
-  - Correlation heatmap for numeric features
-  - Regional cost analysis
+- **📈 Exploratory Analysis:** **Interactive data exploration with dynamic filtering**
+  - **🎛️ Interactive Filters (Sidebar):** Age range, gender, smoker status, region, BMI range, and number of children
+  - **📊 Dynamic Visualizations:** All charts update in real-time based on filter selections:
+    - Charges distribution histogram with adaptive binning
+    - Smoker vs non-smoker charge comparison
+    - BMI vs charges scatter plot (colored by smoker status)
+    - Correlation heatmap for numeric features
+    - Regional cost analysis with geographic heat map and bar charts
+  - **Smart Error Handling:** Graceful handling of edge cases (single categories, small samples)
+  - **Data Quality Warnings:** Alerts when filtered dataset is too small (<30 records)
 - **🔬 Statistical Tests:** All 3 hypothesis tests with visualizations and statistical results:
   - Hypothesis A: Smoker impact (Welch's t-test with boxplots)
   - Hypothesis B: Regional differences (ANOVA with bar charts)
@@ -267,11 +274,13 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 6 in
   - Model validation assessment
 - **🎯 Cost Predictor:** Interactive prediction tool with input form and similar profile analysis
 
-**Navigation Features:**
-- Top navigation map with 6 quick-access info boxes
-- Sidebar page selector with emoji icons
-- Comprehensive descriptions and reflections on every page
-- All visualizations from the Jupyter notebook integrated
+**Interactive Features:**
+- **Real-time filtering:** Explore data segments by demographics, health factors, and location
+- **Dynamic charts:** All visualizations respond to filter changes instantly
+- **Responsive design:** Adapts chart complexity to dataset size
+- **Context-aware messages:** Shows relevant insights based on filtered data
+- **Top navigation map:** Quick-access info boxes for all 6 pages
+- **Sidebar navigation:** Page selector with emoji icons and filter controls
 
 ---
 
@@ -372,11 +381,15 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 6 in
 - Expand dataset size for better generalization
 
 ### Dashboard Features
+- ~~Add interactive filters for data exploration~~ ✅ **COMPLETED**
+- ~~Enable dynamic chart updates based on user selections~~ ✅ **COMPLETED**
 - Add confidence intervals for predictions
 - Enable batch predictions via CSV upload
 - Add partial dependence plots for feature effects
-- Add cost reduction scenario analysis (e.g., impact of smoking cessation)
-- Export functionality for reports and charts
+- Add cost reduction scenario analysis (e.g., impact of smoking cessation programs)
+- Export functionality for filtered data, reports, and charts
+- User authentication for personalized predictions
+- Save and compare multiple prediction scenarios
 
 ---
 
@@ -464,10 +477,20 @@ This study tested three specific hypotheses about healthcare insurance costs:
 - **Solution:** Rewrote all descriptions with plain language, concrete examples, and business implications
 - **Learning:** Data science deliverables must be audience-appropriate; statistical rigor ≠ technical language
 
-**5. Matplotlib Import Errors**
-- **Challenge:** Importing `cm`, `Rectangle`, `Normalize` directly from `matplotlib` caused AttributeError
-- **Solution:** Used explicit submodule imports (`matplotlib.cm`, `matplotlib.patches.Rectangle`, `matplotlib.colors.Normalize`)
-- **Learning:** Python package structure matters; always check official documentation for correct import paths
+**5. Matplotlib Import Errors & Deprecation Warnings**
+- **Challenge:** Importing `cm`, `Rectangle`, `Normalize` directly from `matplotlib` caused AttributeError; `cm.get_cmap()` deprecated in Matplotlib 3.7
+- **Solution:** Used explicit submodule imports (`matplotlib.cm`, `matplotlib.patches.Rectangle`, `matplotlib.colors.Normalize`) and migrated to `plt.colormaps.get_cmap()`
+- **Learning:** Python package structure matters; always check official documentation for correct import paths and stay current with deprecation warnings
+
+**6. Interactive Filter Edge Cases**
+- **Challenge:** Filtering by single smoker status or region caused KeyError when accessing missing categories in pandas groupby results
+- **Solution:** Implemented conditional checks before accessing specific index values and provided contextual messages for filtered views
+- **Learning:** User interactions create unpredictable data states; defensive programming with conditional checks prevents runtime errors
+
+**7. Dynamic Visualization Challenges**
+- **Challenge:** Hard-coded chart colors and normalizations failed when filters reduced categories (e.g., only smokers, single region)
+- **Solution:** Adaptive color assignment based on available categories, division-by-zero protection in normalization, and empty dataframe checks
+- **Learning:** Dynamic UIs require robust error handling; test edge cases (single category, empty results, extreme filters)
 
 ### Skills Developed
 
@@ -475,7 +498,8 @@ This study tested three specific hypotheses about healthcare insurance costs:
 - Statistical hypothesis testing (t-tests, ANOVA, OLS regression)
 - Machine learning pipelines with preprocessing (ColumnTransformer, OneHotEncoder)
 - Model validation (cross-validation, residual diagnostics, Q-Q plots)
-- Interactive dashboard development with Streamlit
+- **Interactive dashboard development with real-time filtering and dynamic visualizations**
+- **Error handling for edge cases and graceful degradation**
 - Version control best practices (v1/ folder structure, .gitignore)
 
 **Analytical:**
@@ -483,11 +507,13 @@ This study tested three specific hypotheses about healthcare insurance costs:
 - Interpreting p-values, confidence intervals, and effect sizes in business context
 - Balancing model complexity vs. interpretability (RandomForest vs. Linear Regression trade-offs)
 - Identifying confounding variables and implementing statistical controls
+- **Designing user-friendly data exploration tools with appropriate warnings**
 
 **Communication:**
 - Translating technical findings into stakeholder-friendly language
 - Creating visualizations with clear titles, labels, and annotations
 - Structuring analysis narratives (hypotheses → tests → conclusions → business actions)
+- **Providing context-aware messages based on filtered data states**
 
 ### Adaptation Process
 
@@ -495,10 +521,20 @@ This project required continuous adaptation of tools and methods:
 
 1. **Statistical Methods:** Started with simple t-tests, evolved to OLS regression with controls to address confounding
 2. **Machine Learning:** Initially explored Linear Regression, switched to RandomForest for better handling of non-linear relationships
-3. **Dashboard Design:** Iterated from basic charts to comprehensive 5-page navigation with business reflections
-4. **Documentation:** Progressed from code comments to formal README with hypothesis validation and methodology justification
+**Dashboard Design Iterations:**
+1. **Initial:** Basic visualizations on single page
+2. **Enhancement:** Multi-page navigation with executive summary
+3. **Advanced:** Interactive filters with real-time chart updates
+4. **Final:** Robust error handling for all filter combinations and edge cases
 
-**Key Takeaway:** Data science projects are inherently iterative; each analysis step reveals new questions requiring methodological adjustments.
+**Analysis Workflow Evolution:**
+1. **Exploratory Phase:** Initial Jupyter notebook with basic EDA
+2. **Statistical Phase:** Hypothesis testing and formal validation
+3. **ML Phase:** Model training with pipeline and cross-validation
+4. **Deployment Phase:** Interactive dashboard with filtering capabilities
+5. **Documentation Phase:** Comprehensive README with methodology and reflections
+
+**Key Takeaway:** Data science projects are inherently iterative; each analysis step reveals new questions requiring methodological adjustments, and production deployment requires extensive edge case testing.
 
 ---
 

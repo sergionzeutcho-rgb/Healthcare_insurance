@@ -11,7 +11,7 @@ from pathlib import Path
 from scipy import stats
 
 # Get the colormap
-reds_cmap = cm.get_cmap('Reds')
+reds_cmap = plt.colormaps.get_cmap('Reds')
 
 # Set page config
 st.set_page_config(
