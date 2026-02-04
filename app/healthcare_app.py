@@ -399,220 +399,368 @@ elif page == "📈 Explore Patterns":
     st.markdown("""
     Visual exploration of the dataset to identify patterns, distributions, and relationships 
     between variables that drive insurance costs.
+    
+    **🎛️ Use the filters in the sidebar to explore different segments of the data!**
     """)
     
     if df is not None:
-        # 1. Charges Distribution
-        st.subheader("1️⃣ Distribution of Insurance Charges")
-        st.markdown(r"""
-        **Distribution pattern:** The majority of policyholders pay between 1,000 and 20,000 USD annually, 
-        though a subset of cases exceed 60,000 USD. These high-cost outliers influence the overall average.
+        # ===== INTERACTIVE FILTERS IN SIDEBAR =====
+        st.sidebar.markdown("---")
+        st.sidebar.header("🎛️ Interactive Filters")
+        st.sidebar.markdown("Filter the data to explore specific segments:")
+        
+        # Age filter
+        age_range = st.sidebar.slider(
+            "Age Range",
+            min_value=int(df['age'].min()),
+            max_value=int(df['age'].max()),
+            value=(int(df['age'].min()), int(df['age'].max())),
+            step=1
+        )
+        
+        # Gender filter
+        gender_options = ['All'] + sorted(df['sex'].unique().tolist())
+        selected_gender = st.sidebar.selectbox("Gender", gender_options)
+        
+        # Smoker filter
+        smoker_options = ['All'] + sorted(df['smoker'].unique().tolist())
+        selected_smoker = st.sidebar.selectbox("Smoker Status", smoker_options)
+        
+        # Region filter
+        region_options = ['All'] + sorted(df['region'].unique().tolist())
+        selected_region = st.sidebar.selectbox("Region", region_options)
+        
+        # BMI filter
+        bmi_range = st.sidebar.slider(
+            "BMI Range",
+            min_value=float(df['bmi'].min()),
+            max_value=float(df['bmi'].max()),
+            value=(float(df['bmi'].min()), float(df['bmi'].max())),
+            step=0.5
+        )
+        
+        # Children filter
+        children_options = ['All'] + sorted(df['children'].unique().tolist())
+        selected_children = st.sidebar.selectbox("Number of Children", children_options)
+        
+        # Apply filters
+        filtered_df = df.copy()
+        filtered_df = filtered_df[
+            (filtered_df['age'] >= age_range[0]) & 
+            (filtered_df['age'] <= age_range[1])
+        ]
+        filtered_df = filtered_df[
+            (filtered_df['bmi'] >= bmi_range[0]) & 
+            (filtered_df['bmi'] <= bmi_range[1])
+        ]
+        
+        if selected_gender != 'All':
+            filtered_df = filtered_df[filtered_df['sex'] == selected_gender]
+        
+        if selected_smoker != 'All':
+            filtered_df = filtered_df[filtered_df['smoker'] == selected_smoker]
+        
+        if selected_region != 'All':
+            filtered_df = filtered_df[filtered_df['region'] == selected_region]
+        
+        if selected_children != 'All':
+            filtered_df = filtered_df[filtered_df['children'] == selected_children]
+        
+        # Display filter summary
+        st.info(f"""
+        **📊 Filtered Dataset:** Showing **{len(filtered_df):,}** of **{len(df):,}** records 
+        ({len(filtered_df)/len(df)*100:.1f}% of total data)
         """)
         
-        fig, ax = plt.subplots(figsize=(10, 5))
-        ax.hist(df['charges'], bins=40, color='skyblue', edgecolor='black', alpha=0.7)
-        ax.set_xlabel('Charges ($)', fontsize=12)
-        ax.set_ylabel('Frequency', fontsize=12)
-        ax.set_title('Distribution of Insurance Charges', fontsize=14, fontweight='bold')
-        ax.grid(axis='y', alpha=0.3)
-        st.pyplot(fig)
+        # Warn if dataset is very small
+        if len(filtered_df) < 30:
+            st.warning("""
+            ⚠️ **Small sample warning:** You're viewing fewer than 30 records. 
+            Statistical patterns may not be reliable with such a small sample. 
+            Consider adjusting filters to include more data.
+            """)
         
-        st.markdown("""
-        **Strategic implication:** High-cost cases are predominantly associated with smokers and individuals with 
-        significant health conditions. Targeted interventions such as smoking cessation programs and comprehensive 
-        wellness support could substantially reduce aggregate costs across the policy portfolio.
-        """)
-        
-        st.markdown("---")
-        
-        # 2. Charges by Smoker
-        st.subheader("2️⃣ Smoker Status Impact")
-        st.markdown("""
-        **Comparative analysis:** The following chart illustrates average costs for smokers versus non-smokers.
-        """)
-        
-        fig, ax = plt.subplots(figsize=(8, 5))
-        smoker_data = df.groupby('smoker')['charges'].mean().sort_values(ascending=False)
-        bars = ax.bar(smoker_data.index, smoker_data.values, color=['coral', 'lightgreen'], 
+        if len(filtered_df) == 0:
+            st.warning("⚠️ No data matches the selected filters. Please adjust your criteria.")
+        else:
+            # 1. Charges Distribution
+            st.subheader("1️⃣ Distribution of Insurance Charges")
+            st.markdown(r"""
+            **Distribution pattern:** The majority of policyholders pay between 1,000 and 20,000 USD annually, 
+            though a subset of cases exceed 60,000 USD. These high-cost outliers influence the overall average.
+            """)
+            
+            fig, ax = plt.subplots(figsize=(10, 5))
+            # Adaptive bins: use fewer bins for smaller datasets
+            n_bins = min(40, max(10, len(filtered_df) // 10))
+            ax.hist(filtered_df['charges'], bins=n_bins, color='skyblue', edgecolor='black', alpha=0.7)
+            ax.set_xlabel('Charges ($)', fontsize=12)
+            ax.set_ylabel('Frequency', fontsize=12)
+            ax.set_title('Distribution of Insurance Charges', fontsize=14, fontweight='bold')
+            ax.grid(axis='y', alpha=0.3)
+            st.pyplot(fig)
+            
+            st.markdown("""
+            **Strategic implication:** High-cost cases are predominantly associated with smokers and individuals with 
+            significant health conditions. Targeted interventions such as smoking cessation programs and comprehensive 
+            wellness support could substantially reduce aggregate costs across the policy portfolio.
+            """)
+            
+            st.markdown("---")
+            
+            # 2. Charges by Smoker
+            st.subheader("2️⃣ Smoker Status Impact")
+            st.markdown("""
+            **Comparative analysis:** The following chart illustrates average costs for smokers versus non-smokers.
+            """)
+            
+            fig, ax = plt.subplots(figsize=(8, 5))
+            smoker_data = filtered_df.groupby('smoker')['charges'].mean().sort_values(ascending=False)
+            
+            # Assign colors based on how many categories we have
+            if len(smoker_data) == 2:
+                # Both yes and no - use appropriate colors
+                bar_colors = ['coral' if idx == 'yes' else 'lightgreen' for idx in smoker_data.index]
+            else:
+                # Only one category - use appropriate color
+                bar_colors = ['coral' if smoker_data.index[0] == 'yes' else 'lightgreen']
+            
+            bars = ax.bar(smoker_data.index, smoker_data.values, color=bar_colors, 
                        edgecolor='black', alpha=0.7)
-        ax.set_ylabel('Average Charges ($)', fontsize=12)
-        ax.set_title('Average Charges by Smoker Status', fontsize=14, fontweight='bold')
-        ax.grid(axis='y', alpha=0.3)
-        
-        # Add value labels on bars
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'${height:,.0f}',
-                   ha='center', va='bottom', fontweight='bold')
-        st.pyplot(fig)
-        
-        non_smoker_avg = smoker_data['no']
-        smoker_avg = smoker_data['yes']
-        difference = smoker_avg - non_smoker_avg
-        pct_more = (difference / non_smoker_avg * 100)
-        
-        # Format numbers without dollar signs to avoid LaTeX rendering
-        non_smoker_fmt = f"{non_smoker_avg:,.0f}"
-        smoker_fmt = f"{smoker_avg:,.0f}"
-        diff_fmt = f"{difference:,.0f}"
-        
-        st.markdown(f"""
-        **Analysis:** Non-smokers pay approximately {non_smoker_fmt} USD on average, while smokers 
-        pay {smoker_fmt} USD. This represents a difference of {diff_fmt} USD, 
-        meaning smokers pay {pct_more:.1f}% more. 
-        These findings confirm that smoking is the primary factor driving increased insurance costs.
-        """)
-        
-        st.markdown("---")
-        
-        # 3. BMI vs Charges
-        st.subheader("3️⃣ BMI and Cost Relationship")
-        st.markdown("""
-        **Findings:** Higher BMI values correlate with increased charges, with this effect being particularly pronounced among smokers.
-        """)
-        
-        fig, ax = plt.subplots(figsize=(10, 6))
-        smokers = df[df['smoker'] == 'yes']
-        non_smokers = df[df['smoker'] == 'no']
-        ax.scatter(non_smokers['bmi'], non_smokers['charges'], alpha=0.5, 
-                  label='Non-smoker', s=40, color='lightgreen', edgecolors='darkgreen')
-        ax.scatter(smokers['bmi'], smokers['charges'], alpha=0.5, 
-                  label='Smoker', s=40, color='coral', edgecolors='darkred')
-        ax.set_xlabel('BMI', fontsize=12)
-        ax.set_ylabel('Charges ($)', fontsize=12)
-        ax.set_title('BMI vs Charges (by Smoker Status)', fontsize=14, fontweight='bold')
-        ax.legend(fontsize=11)
-        ax.grid(alpha=0.3)
-        st.pyplot(fig)
-        
-        st.markdown("""
-        **Interpretation:** The scatter plot reveals that smokers (coral points) are concentrated in the higher charge regions 
-        regardless of BMI. Additionally, as BMI increases, costs tend to rise for both groups. This suggests an interaction 
-        effect where both factors contribute to elevated costs, with combined impact exceeding individual effects.
-        """)
-        
-        st.markdown("---")
-        
-        # 4. Correlation Matrix
-        st.subheader("4️⃣ Correlation Matrix (Numeric Variables)")
-        st.markdown("""
-        **What we found:** Age and BMI both show positive connections with charges.
-        """)
-        
-        numeric_cols = ['age', 'bmi', 'children', 'charges']
-        corr = df[numeric_cols].corr()
-        
-        fig, ax = plt.subplots(figsize=(8, 6))
-        sns.heatmap(corr, annot=True, fmt='.3f', cmap='coolwarm', center=0,
-                   square=True, linewidths=1, cbar_kws={"shrink": 0.8}, ax=ax)
-        ax.set_title('Correlation Matrix (Numeric Variables)', fontsize=14, fontweight='bold')
-        st.pyplot(fig)
-        
-        st.markdown("""
-        **Interpretation:** 
-        - **Age:** Demonstrates moderate positive correlation (0.299) with charges; older policyholders tend to incur higher costs
-        - **BMI:** Shows weaker positive correlation (0.198), though still statistically meaningful  
-        - **Children:** Exhibits minimal correlation (0.068), suggesting number of dependents has limited impact on costs
-        - Note: Smoking status (categorical variable) is not represented in this matrix but remains the strongest cost predictor
-        """)
-        
-        st.markdown("---")
-        
-        # 5. Charges by Region with Geographic Map
-        st.subheader("5️⃣ Average Charges by Region")
-        st.markdown("""
-        **Key Finding:** Regional differences exist but are modest compared to smoker status.
-        """)
-        
-        region_data = df.groupby('region')['charges'].agg(['mean', 'count']).sort_values('mean', ascending=False)
-        
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
-            # Geographic map visualization
-            fig_map, ax_map = plt.subplots(figsize=(10, 6))
+            ax.set_ylabel('Average Charges ($)', fontsize=12)
+            ax.set_title('Average Charges by Smoker Status', fontsize=14, fontweight='bold')
+            ax.grid(axis='y', alpha=0.3)
             
-            # Define region positions (approximate US regions)
-            regions_coords = {
-                'northwest': (0.25, 0.75),
-                'northeast': (0.75, 0.75),
-                'southwest': (0.25, 0.25),
-                'southeast': (0.75, 0.25)
-            }
-            
-            # Get colors based on charge values
-            charges_normalized = (region_data['mean'] - region_data['mean'].min()) / (region_data['mean'].max() - region_data['mean'].min())
-            
-            # Plot each region as a colored square
-            for region in regions_coords:
-                x, y = regions_coords[region]
-                if region in region_data.index:
-                    avg_charge = region_data.loc[region, 'mean']
-                    color_intensity = charges_normalized.loc[region]
-                    color = reds_cmap(0.3 + color_intensity * 0.6)
-                    
-                    # Draw region box
-                    rect = Rectangle((x-0.2, y-0.2), 0.4, 0.4, 
-                                        facecolor=color, edgecolor='black', linewidth=2)
-                    ax_map.add_patch(rect)
-                    
-                    # Add region name and charge
-                    ax_map.text(x, y+0.05, region.upper().replace('NORTH', 'N').replace('SOUTH', 'S'),
-                              ha='center', va='center', fontweight='bold', fontsize=11)
-                    ax_map.text(x, y-0.05, f'${avg_charge:,.0f}',
-                              ha='center', va='center', fontsize=10, color='darkred', fontweight='bold')
-            
-            ax_map.set_xlim(0, 1)
-            ax_map.set_ylim(0, 1)
-            ax_map.set_aspect('equal')
-            ax_map.axis('off')
-            ax_map.set_title('Geographic Distribution of Average Charges', 
-                           fontsize=14, fontweight='bold', pad=20)
-            
-            # Add colorbar legend
-            sm = cm.ScalarMappable(cmap=reds_cmap, 
-                                      norm=Normalize(vmin=region_data['mean'].min(), 
-                                                        vmax=region_data['mean'].max()))
-            sm.set_array([])
-            cbar = plt.colorbar(sm, ax=ax_map, orientation='horizontal', pad=0.05, aspect=30)
-            cbar.set_label('Average Charges ($)', fontsize=10)
-            
-            st.pyplot(fig_map)
-        
-        with col2:
-            # Bar chart
-            fig_bar, ax_bar = plt.subplots(figsize=(10, 6))
-            bars = ax_bar.bar(region_data.index, region_data['mean'], color='steelblue', 
-                         edgecolor='black', alpha=0.7)
-            ax_bar.set_ylabel('Average Charges ($)', fontsize=12)
-            ax_bar.set_xlabel('Region', fontsize=12)
-            ax_bar.set_title('Average Insurance Charges by Region', fontsize=14, fontweight='bold')
-            ax_bar.grid(axis='y', alpha=0.3)
-            
-            # Add value labels
+            # Add value labels on bars
             for bar in bars:
                 height = bar.get_height()
-                ax_bar.text(bar.get_x() + bar.get_width()/2., height,
+                ax.text(bar.get_x() + bar.get_width()/2., height,
                        f'${height:,.0f}',
-                       ha='center', va='bottom', fontweight='bold', fontsize=10)
-            st.pyplot(fig_bar)
-        
-        se_charges = region_data.loc['southeast', 'mean']
-        sw_charges = region_data.loc['southwest', 'mean']
-        regional_diff = region_data['mean'].max() - region_data['mean'].min()
-        
-        # Format numbers without dollar signs to avoid LaTeX rendering
-        se_fmt = f"{se_charges:,.0f}"
-        sw_fmt = f"{sw_charges:,.0f}"
-        diff_fmt = f"{regional_diff:,.0f}"
-        
-        st.markdown(f"""
-        **Key findings:** The Southeast region has the highest average charges at {se_fmt} USD, 
-        while the Southwest has the lowest at {sw_fmt} USD. 
-        This represents a difference of approximately {diff_fmt} USD, which is 
-        relatively modest when compared to the substantial impact of smoking status.
-        """)
+                       ha='center', va='bottom', fontweight='bold')
+            st.pyplot(fig)
+            
+            # Only show comparison if both smoker categories exist in filtered data
+            if 'no' in smoker_data.index and 'yes' in smoker_data.index:
+                non_smoker_avg = smoker_data['no']
+                smoker_avg = smoker_data['yes']
+                difference = smoker_avg - non_smoker_avg
+                pct_more = (difference / non_smoker_avg * 100)
+                
+                # Format numbers without dollar signs to avoid LaTeX rendering
+                non_smoker_fmt = f"{non_smoker_avg:,.0f}"
+                smoker_fmt = f"{smoker_avg:,.0f}"
+                diff_fmt = f"{difference:,.0f}"
+                
+                st.markdown(f"""
+                **Analysis:** Non-smokers pay approximately {non_smoker_fmt} USD on average, while smokers 
+                pay {smoker_fmt} USD. This represents a difference of {diff_fmt} USD, 
+                meaning smokers pay {pct_more:.1f}% more. 
+                These findings confirm that smoking is the primary factor driving increased insurance costs.
+                """)
+            else:
+                # Show message when only one category is present
+                if 'yes' in smoker_data.index:
+                    st.markdown(f"""
+                    **Filtered View:** Showing only smokers in this filtered dataset. 
+                    Average charge: {smoker_data['yes']:,.0f} USD.
+                    """)
+                elif 'no' in smoker_data.index:
+                    st.markdown(f"""
+                    **Filtered View:** Showing only non-smokers in this filtered dataset. 
+                    Average charge: {smoker_data['no']:,.0f} USD.
+                    """)
+            
+            st.markdown("---")
+            
+            # 3. BMI vs Charges
+            st.subheader("3️⃣ BMI and Cost Relationship")
+            st.markdown("""
+            **Findings:** Higher BMI values correlate with increased charges, with this effect being particularly pronounced among smokers.
+            """)
+            
+            fig, ax = plt.subplots(figsize=(10, 6))
+            smokers = filtered_df[filtered_df['smoker'] == 'yes']
+            non_smokers = filtered_df[filtered_df['smoker'] == 'no']
+            
+            # Plot only if data exists for each group
+            if not non_smokers.empty:
+                ax.scatter(non_smokers['bmi'], non_smokers['charges'], alpha=0.5, 
+                          label='Non-smoker', s=40, color='lightgreen', edgecolors='darkgreen')
+            if not smokers.empty:
+                ax.scatter(smokers['bmi'], smokers['charges'], alpha=0.5, 
+                          label='Smoker', s=40, color='coral', edgecolors='darkred')
+            
+            ax.set_xlabel('BMI', fontsize=12)
+            ax.set_ylabel('Charges ($)', fontsize=12)
+            ax.set_title('BMI vs Charges (by Smoker Status)', fontsize=14, fontweight='bold')
+            ax.legend(fontsize=11)
+            ax.grid(alpha=0.3)
+            st.pyplot(fig)
+            
+            # Update interpretation based on what's visible
+            if not smokers.empty and not non_smokers.empty:
+                st.markdown("""
+                **Interpretation:** The scatter plot reveals that smokers (coral points) are concentrated in the higher charge regions 
+                regardless of BMI. Additionally, as BMI increases, costs tend to rise for both groups. This suggests an interaction 
+                effect where both factors contribute to elevated costs, with combined impact exceeding individual effects.
+                """)
+            elif not smokers.empty:
+                st.markdown("""
+                **Interpretation:** Showing smokers only in this filtered view. Notice how charges vary with BMI levels.
+                """)
+            elif not non_smokers.empty:
+                st.markdown("""
+                **Interpretation:** Showing non-smokers only in this filtered view. Notice how charges vary with BMI levels.
+                """)
+            
+            st.markdown("---")
+            
+            # 4. Correlation Matrix
+            st.subheader("4️⃣ Correlation Matrix (Numeric Variables)")
+            st.markdown("""
+            **What we found:** Age and BMI both show positive connections with charges.
+            """)
+            
+            numeric_cols = ['age', 'bmi', 'children', 'charges']
+            corr = filtered_df[numeric_cols].corr()
+            
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.heatmap(corr, annot=True, fmt='.3f', cmap='coolwarm', center=0,
+                       square=True, linewidths=1, cbar_kws={"shrink": 0.8}, ax=ax)
+            ax.set_title('Correlation Matrix (Numeric Variables)', fontsize=14, fontweight='bold')
+            st.pyplot(fig)
+            
+            st.markdown("""
+            **Interpretation:** 
+            - **Age:** Demonstrates moderate positive correlation (0.299) with charges; older policyholders tend to incur higher costs
+            - **BMI:** Shows weaker positive correlation (0.198), though still statistically meaningful  
+            - **Children:** Exhibits minimal correlation (0.068), suggesting number of dependents has limited impact on costs
+            - Note: Smoking status (categorical variable) is not represented in this matrix but remains the strongest cost predictor
+            """)
+            
+            st.markdown("---")
+            
+            # 5. Charges by Region with Geographic Map
+            st.subheader("5️⃣ Average Charges by Region")
+            st.markdown("""
+            **Key Finding:** Regional differences exist but are modest compared to smoker status.
+            """)
+            
+            region_data = filtered_df.groupby('region')['charges'].agg(['mean', 'count']).sort_values('mean', ascending=False)
+            
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                # Geographic map visualization
+                fig_map, ax_map = plt.subplots(figsize=(10, 6))
+                
+                # Define region positions (approximate US regions)
+                regions_coords = {
+                    'northwest': (0.25, 0.75),
+                    'northeast': (0.75, 0.75),
+                    'southwest': (0.25, 0.25),
+                    'southeast': (0.75, 0.25)
+                }
+                
+                # Get colors based on charge values (avoid division by zero)
+                if region_data['mean'].max() != region_data['mean'].min():
+                    charges_normalized = (region_data['mean'] - region_data['mean'].min()) / (region_data['mean'].max() - region_data['mean'].min())
+                else:
+                    # All regions have same average (or only one region)
+                    charges_normalized = pd.Series(0.5, index=region_data.index)
+                
+                # Plot each region as a colored square
+                for region in regions_coords:
+                    x, y = regions_coords[region]
+                    if region in region_data.index:
+                        avg_charge = region_data.loc[region, 'mean']
+                        color_intensity = charges_normalized.loc[region]
+                        color = reds_cmap(0.3 + color_intensity * 0.6)
+                        
+                        # Draw region box
+                        rect = Rectangle((x-0.2, y-0.2), 0.4, 0.4, 
+                                            facecolor=color, edgecolor='black', linewidth=2)
+                        ax_map.add_patch(rect)
+                        
+                        # Add region name and charge
+                        ax_map.text(x, y+0.05, region.upper().replace('NORTH', 'N').replace('SOUTH', 'S'),
+                                  ha='center', va='center', fontweight='bold', fontsize=11)
+                        ax_map.text(x, y-0.05, f'${avg_charge:,.0f}',
+                                  ha='center', va='center', fontsize=10, color='darkred', fontweight='bold')
+                
+                ax_map.set_xlim(0, 1)
+                ax_map.set_ylim(0, 1)
+                ax_map.set_aspect('equal')
+                ax_map.axis('off')
+                ax_map.set_title('Geographic Distribution of Average Charges', 
+                               fontsize=14, fontweight='bold', pad=20)
+                
+                # Add colorbar legend
+                sm = cm.ScalarMappable(cmap=reds_cmap, 
+                                          norm=Normalize(vmin=region_data['mean'].min(), 
+                                                            vmax=region_data['mean'].max()))
+                sm.set_array([])
+                cbar = plt.colorbar(sm, ax=ax_map, orientation='horizontal', pad=0.05, aspect=30)
+                cbar.set_label('Average Charges ($)', fontsize=10)
+                
+                st.pyplot(fig_map)
+            
+            with col2:
+                # Bar chart
+                fig_bar, ax_bar = plt.subplots(figsize=(10, 6))
+                bars = ax_bar.bar(region_data.index, region_data['mean'], color='steelblue', 
+                             edgecolor='black', alpha=0.7)
+                ax_bar.set_ylabel('Average Charges ($)', fontsize=12)
+                ax_bar.set_xlabel('Region', fontsize=12)
+                ax_bar.set_title('Average Insurance Charges by Region', fontsize=14, fontweight='bold')
+                ax_bar.grid(axis='y', alpha=0.3)
+                
+                # Add value labels
+                for bar in bars:
+                    height = bar.get_height()
+                    ax_bar.text(bar.get_x() + bar.get_width()/2., height,
+                           f'${height:,.0f}',
+                           ha='center', va='bottom', fontweight='bold', fontsize=10)
+                st.pyplot(fig_bar)
+            
+            # Only show detailed comparison if we have multiple regions
+            if len(region_data) > 1:
+                # Check if southeast and southwest exist in filtered data
+                if 'southeast' in region_data.index and 'southwest' in region_data.index:
+                    se_charges = region_data.loc['southeast', 'mean']
+                    sw_charges = region_data.loc['southwest', 'mean']
+                    regional_diff = region_data['mean'].max() - region_data['mean'].min()
+                    
+                    # Format numbers without dollar signs to avoid LaTeX rendering
+                    se_fmt = f"{se_charges:,.0f}"
+                    sw_fmt = f"{sw_charges:,.0f}"
+                    diff_fmt = f"{regional_diff:,.0f}"
+                    
+                    st.markdown(f"""
+                    **Key findings:** The Southeast region has the highest average charges at {se_fmt} USD, 
+                    while the Southwest has the lowest at {sw_fmt} USD. 
+                    This represents a difference of approximately {diff_fmt} USD, which is 
+                    relatively modest when compared to the substantial impact of smoking status.
+                    """)
+                else:
+                    # Generic message when specific regions aren't available
+                    highest_region = region_data['mean'].idxmax()
+                    lowest_region = region_data['mean'].idxmin()
+                    regional_diff = region_data['mean'].max() - region_data['mean'].min()
+                    
+                    st.markdown(f"""
+                    **Key findings:** In the filtered data, {highest_region} has the highest average charges 
+                    at {region_data.loc[highest_region, 'mean']:,.0f} USD, while {lowest_region} has the lowest 
+                    at {region_data.loc[lowest_region, 'mean']:,.0f} USD. 
+                    Regional difference: {regional_diff:,.0f} USD.
+                    """)
+            else:
+                # Only one region in filtered data
+                single_region = region_data.index[0]
+                st.markdown(f"""
+                **Filtered View:** Showing only {single_region} region in this filtered dataset. 
+                Average charge: {region_data.loc[single_region, 'mean']:,.0f} USD.
+                """)
         
     else:
         st.error("⚠️ Data not found.")
