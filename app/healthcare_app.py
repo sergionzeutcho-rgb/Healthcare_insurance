@@ -246,11 +246,11 @@ if page == "📝 Executive Summary":
         """)
     
     st.info(r"""
-    **Understanding the $2,549 Error Metric:**
+    **Understanding the MAE of 2,549 USD:**
     
     This Mean Absolute Error (MAE) represents the average prediction error across all estimates. 
-    Given that insurance costs in our dataset range from $1,122 to $63,770 (average: $13,270), 
-    a $2,549 error translates to approximately 19% average deviation. 
+    Given that insurance costs in our dataset range from 1,122 to 63,770 USD (average: 13,270 USD), 
+    an error of 2,549 USD translates to approximately 19% average deviation. 
     
     This performance is acceptable considering the model uses only six basic demographic and health 
     attributes, whereas comprehensive insurance underwriting typically incorporates dozens of factors 
@@ -385,7 +385,7 @@ elif page == "📊 See the Data":
             "children": "Number of children/dependents (0-5)",
             "smoker": "Smoking status (yes/no)",
             "region": "Geographic region (northeast, northwest, southeast, southwest)",
-            "charges": "Medical insurance costs - TARGET VARIABLE (range: $1,122 to $63,770)"
+            "charges": "Medical insurance costs - TARGET VARIABLE (range: 1,122 to 63,770 USD)"
         }
         for feat, desc in feature_desc.items():
             st.markdown(f"**`{feat}`**: {desc}")
@@ -405,8 +405,8 @@ elif page == "📈 Explore Patterns":
         # 1. Charges Distribution
         st.subheader("1️⃣ Distribution of Insurance Charges")
         st.markdown(r"""
-        **Distribution pattern:** The majority of policyholders pay between $1,000 and $20,000 annually, 
-        though a subset of cases exceed $60,000. These high-cost outliers influence the overall average.
+        **Distribution pattern:** The majority of policyholders pay between 1,000 and 20,000 USD annually, 
+        though a subset of cases exceed 60,000 USD. These high-cost outliers influence the overall average.
         """)
         
         fig, ax = plt.subplots(figsize=(10, 5))
@@ -452,9 +452,14 @@ elif page == "📈 Explore Patterns":
         difference = smoker_avg - non_smoker_avg
         pct_more = (difference / non_smoker_avg * 100)
         
+        # Format numbers without dollar signs to avoid LaTeX rendering
+        non_smoker_fmt = f"{non_smoker_avg:,.0f}"
+        smoker_fmt = f"{smoker_avg:,.0f}"
+        diff_fmt = f"{difference:,.0f}"
+        
         st.markdown(f"""
-        **Analysis:** Non-smokers pay approximately ${non_smoker_avg:,.0f} on average, while smokers 
-        pay ${smoker_avg:,.0f}. This represents a difference of ${difference:,.0f}, 
+        **Analysis:** Non-smokers pay approximately {non_smoker_fmt} USD on average, while smokers 
+        pay {smoker_fmt} USD. This represents a difference of {diff_fmt} USD, 
         meaning smokers pay {pct_more:.1f}% more. 
         These findings confirm that smoking is the primary factor driving increased insurance costs.
         """)
@@ -597,10 +602,15 @@ elif page == "📈 Explore Patterns":
         sw_charges = region_data.loc['southwest', 'mean']
         regional_diff = region_data['mean'].max() - region_data['mean'].min()
         
+        # Format numbers without dollar signs to avoid LaTeX rendering
+        se_fmt = f"{se_charges:,.0f}"
+        sw_fmt = f"{sw_charges:,.0f}"
+        diff_fmt = f"{regional_diff:,.0f}"
+        
         st.markdown(f"""
-        **Key findings:** The Southeast region has the highest average charges at ${se_charges:,.0f}, 
-        while the Southwest has the lowest at ${sw_charges:,.0f}. 
-        This represents a difference of approximately ${regional_diff:,.0f}, which is 
+        **Key findings:** The Southeast region has the highest average charges at {se_fmt} USD, 
+        while the Southwest has the lowest at {sw_fmt} USD. 
+        This represents a difference of approximately {diff_fmt} USD, which is 
         relatively modest when compared to the substantial impact of smoking status.
         """)
         
@@ -823,13 +833,13 @@ elif page == "🤖 Our Model":
         """)
         
         st.info(r"""
-        **Understanding the Mean Absolute Error (MAE) of $2,549:**
+        **Understanding the Mean Absolute Error (MAE) of 2,549 USD:**
         
         This metric represents the average absolute difference between predicted and actual costs.
         
         **Context:**
-        - Insurance costs range: $1,122 to $63,770 in our dataset
-        - Average cost: approximately $13,270
+        - Insurance costs range: 1,122 to 63,770 USD in our dataset
+        - Average cost: approximately 13,270 USD
         - MAE as percentage: approximately 19% of average cost
         
         **Why this level of error?**
@@ -974,7 +984,7 @@ elif page == "🤖 Our Model":
             ### Model Approach Validation
 
             **Regression for continuous charges:**
-            - Insurance charges are continuous dollar amounts ranging from approximately $1,100 to approximately $63,770
+            - Insurance charges are continuous dollar amounts ranging from approximately 1,100 to 63,770 USD
             - This makes supervised regression the appropriate approach rather than classification
 
             **Feature set justification:**
@@ -998,7 +1008,7 @@ elif page == "🤖 Our Model":
 
             **📊 Actual vs Predicted Plot:**
             - Points close to the red diagonal line indicate accurate predictions
-            - The scatter shows the model captures the general trend well, particularly for lower charges (range: $5,000 to $30,000)
+            - The scatter shows the model captures the general trend well, particularly for lower charges (range: 5,000 to 30,000 USD)
             - Smokers (high charges) show more spread, suggesting the model struggles slightly with extreme values
             - Overall fit remains strong (R² = {r2:.4f})
 
