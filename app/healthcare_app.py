@@ -38,6 +38,16 @@ def load_data():
 model = load_model()
 df = load_data()
 
+# Error handling for missing files
+if df is None:
+    st.error("🚨 **Data file missing!** Cannot load dashboard.")
+    st.info("Please ensure `data/v1/processed/insurance_clean.csv` exists in the project directory.")
+    st.stop()
+
+if model is None:
+    st.warning("⚠️ **Model file missing.** Prediction page will be unavailable.")
+    st.info("Run the training script to generate the model: `python src/v1/train.py`")
+
 # Title and intro
 st.title("🏥 Healthcare Insurance Cost Analysis & Prediction")
 st.markdown("""
@@ -45,21 +55,38 @@ st.markdown("""
 predicts charges for new customers. No statistics background needed. Everything is explained in plain language!
 """)
 
-# Navigation Map at the top
-st.markdown("### 🗺️ Quick Guide: What's Inside")
+# Navigation Map at the top - Interactive clickable boxes
+st.markdown("### 🗺️ Quick Guide: What's Inside (Click to Navigate)")
+
+# Initialize session state for page if not exists
+if 'current_page' not in st.session_state:
+    st.session_state.current_page = "📝 Executive Summary"
+
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 with col1:
-    st.info("📝 **Summary**\n\nKey findings")
+    if st.button("📝 **Summary**\n\nKey findings", use_container_width=True, key="nav_summary"):
+        st.session_state.current_page = "📝 Executive Summary"
+        st.rerun()
 with col2:
-    st.info("📊 **Data**\n\nWhat we analyzed")
+    if st.button("📊 **Data**\n\nWhat we analyzed", use_container_width=True, key="nav_data"):
+        st.session_state.current_page = "📊 See the Data"
+        st.rerun()
 with col3:
-    st.info("📈 **Patterns**\n\nVisual insights")
+    if st.button("📈 **Patterns**\n\nVisual insights", use_container_width=True, key="nav_patterns"):
+        st.session_state.current_page = "📈 Explore Patterns"
+        st.rerun()
 with col4:
-    st.info("🔍 **Tests**\n\nProven results")
+    if st.button("🔍 **Tests**\n\nProven results", use_container_width=True, key="nav_tests"):
+        st.session_state.current_page = "🔍 Test Results"
+        st.rerun()
 with col5:
-    st.info("🤖 **Model**\n\nPrediction accuracy")
+    if st.button("🤖 **Model**\n\nPrediction accuracy", use_container_width=True, key="nav_model"):
+        st.session_state.current_page = "🤖 Our Model"
+        st.rerun()
 with col6:
-    st.info("🎯 **Predict**\n\nEstimate costs")
+    if st.button("🎯 **Predict**\n\nEstimate costs", use_container_width=True, key="nav_predict"):
+        st.session_state.current_page = "🎯 Predict Costs"
+        st.rerun()
 
 st.markdown("---")
 
@@ -72,7 +99,17 @@ page = st.sidebar.radio("Choose a section:", [
     "🔍 Test Results",
     "🤖 Our Model",
     "🎯 Predict Costs"
-])
+], index=[
+    "📝 Executive Summary",
+    "📊 See the Data", 
+    "📈 Explore Patterns", 
+    "🔍 Test Results",
+    "🤖 Our Model",
+    "🎯 Predict Costs"
+].index(st.session_state.current_page))
+
+# Update session state from sidebar selection
+st.session_state.current_page = page
 
 # ===== PAGE 0: EXECUTIVE SUMMARY =====
 if page == "📝 Executive Summary":
@@ -403,6 +440,12 @@ elif page == "📈 Explore Patterns":
     **🎛️ Use the filters in the sidebar to explore different segments of the data!**
     """)
     
+    # Highlight new feature
+    st.success("""
+    💡 **NEW FEATURE:** After applying filters, you can **download the filtered data** as a CSV file 
+    for further analysis or reporting. Look for the download button below the filter summary!
+    """)
+    
     if df is not None:
         # ===== INTERACTIVE FILTERS IN SIDEBAR =====
         st.sidebar.markdown("---")
@@ -467,10 +510,25 @@ elif page == "📈 Explore Patterns":
             filtered_df = filtered_df[filtered_df['children'] == selected_children]
         
         # Display filter summary
-        st.info(f"""
-        **📊 Filtered Dataset:** Showing **{len(filtered_df):,}** of **{len(df):,}** records 
-        ({len(filtered_df)/len(df)*100:.1f}% of total data)
-        """)
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.info(f"""
+            **📊 Filtered Dataset:** Showing **{len(filtered_df):,}** of **{len(df):,}** records 
+            ({len(filtered_df)/len(df)*100:.1f}% of total data)
+            """)
+        with col2:
+            # Download filtered data button
+            if len(filtered_df) > 0:
+                csv = filtered_df.to_csv(index=False)
+                st.download_button(
+                    label="📥 Export as CSV",
+                    data=csv,
+                    file_name=f"insurance_data_{len(filtered_df)}_records.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                    type="primary",
+                    help="Download the currently filtered dataset as a CSV file"
+                )
         
         # Warn if dataset is very small
         if len(filtered_df) < 30:
@@ -1210,6 +1268,13 @@ elif page == "🎯 Predict Costs":
         Predictions are based on the validated model with 88.4% accuracy.
         """)
         
+        # Highlight cost reduction feature
+        st.info("""
+        💡 **BONUS FEATURE:** If you select "Smoker = yes", the tool will automatically calculate 
+        **potential annual savings** if the person quits smoking! This helps identify opportunities 
+        for smoking cessation programs.
+        """)
+        
         col1, col2 = st.columns(2)
         
         with col1:
@@ -1238,6 +1303,29 @@ elif page == "🎯 Predict Costs":
             
             # Display result
             st.success(f"### Estimated Insurance Cost: ${prediction:,.2f}")
+            
+            # Cost Reduction Calculator
+            if smoker == "yes":
+                st.markdown("---")
+                st.subheader("💡 Cost Reduction Scenario")
+                
+                # Calculate cost if person quits smoking
+                input_data_quit = input_data.copy()
+                input_data_quit['smoker'] = 'no'
+                quit_prediction = model.predict(input_data_quit)[0]
+                savings = prediction - quit_prediction
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Current Cost (Smoker)", f"${prediction:,.0f}")
+                with col2:
+                    st.metric("If Quit Smoking", f"${quit_prediction:,.0f}", 
+                             delta=f"-${savings:,.0f}", delta_color="inverse")
+                
+                st.success(f"🎯 **Potential Annual Savings: ${savings:,.2f}** by quitting smoking!")
+                st.info("💡 This represents a significant opportunity for cost reduction through smoking cessation programs.")
+            
+            st.markdown("---")
             
             # Show comparison
             if df is not None:
