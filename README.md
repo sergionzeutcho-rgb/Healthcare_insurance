@@ -610,13 +610,10 @@ The dashboard provides a comprehensive, stakeholder-friendly interface with 6 in
 - Expand dataset size for better generalization
 
 ### Dashboard Features
-- ~~Add interactive filters for data exploration~~ ✅ **COMPLETED**
-- ~~Enable dynamic chart updates based on user selections~~ ✅ **COMPLETED**
 - Add confidence intervals for predictions
 - Enable batch predictions via CSV upload
 - Add partial dependence plots for feature effects
 - Add cost reduction scenario analysis (e.g., impact of smoking cessation programs)
-- Export functionality for filtered data, reports, and charts
 - User authentication for personalized predictions
 - Save and compare multiple prediction scenarios
 
