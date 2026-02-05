@@ -11,8 +11,8 @@ This project provides a comprehensive analysis of healthcare insurance costs usi
 **Key Features:**
 - Statistical hypothesis testing with comprehensive visualizations (t-tests, ANOVA, OLS regression)
 - Machine learning cost prediction (RandomForest with 88.4% R²)
-- **Interactive 6-page Streamlit dashboard with real-time data filtering**
-- **Dynamic charts that update based on user-selected filters (age, gender, smoker, region, BMI, children)**
+- Interactive 6-page Streamlit dashboard with real-time data filtering
+- Dynamic charts that update based on user-selected filters (age, gender, smoker, region, BMI, children)
 - Comprehensive exploratory data analysis (EDA) with 10+ visualizations
 - Geographic heat map for regional cost analysis
 - Feature importance analysis and 5-fold cross-validation
