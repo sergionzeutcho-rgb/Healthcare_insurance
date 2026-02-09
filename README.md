@@ -2,6 +2,8 @@
 
 ![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
 
+**Live Dashboard:** [https://healthcare-insurance-analysis-458367d6f53e.herokuapp.com/](https://healthcare-insurance-analysis-458367d6f53e.herokuapp.com/)
+
 ## Project Overview
 
 This project provides a comprehensive analysis of healthcare insurance costs using statistical hypothesis testing and machine learning. It includes an interactive Streamlit dashboard for data exploration and cost prediction based on client attributes.
